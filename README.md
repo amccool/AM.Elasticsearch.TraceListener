@@ -1,0 +1,2 @@
+# ElasticSearch.Diagnostics
+ElasticSearch TraceListener
