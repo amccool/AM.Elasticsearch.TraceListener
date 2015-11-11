@@ -6,62 +6,68 @@ ElasticSearch TraceListener is a System.Diagnostics based TraceListener which su
 
 Install the package from nu-get http://www.nuget.org/packages/ElasticSearch.Diagnostics/
 
-And add the following settings to your application
+Install-Package ElasticSearch.Diagnostics.TraceListener
 
-    <add key="ElasticSearchUri" value="http://127.0.0.1:9200" />
-    <add key="ElasticSearchIndex" value="elknet" />
-    <add key="ElasticSearchTraceIndex" value="elknet" />
+edit your app.config/web.config
 
-***Please note: Elk.NET automaticly appends the date to the index.***
+    <system.diagnostics>
+        <sharedListeners>
+            <add name="estl" type="ElasticSearch.Diagnostics.ElasticSearchTraceListener, ElasticSearch.Diagnostics"
+                ElasticSearchUri="http://127.1.1.1:9200"
+                ElasticSearchIndex="trace"
+                ElasticSearchTraceIndex="trace"
+            />
+        </sharedListeners>
+        <trace autoflush="false" indentsize="4">
+          <listeners>
+            <!--<remove name="Default" />-->
+            <add name="estl" />
+          </listeners>
+        </trace>
+    <sources>
+      <source name="MY-SILLY-TRACESOURCE" switchValue="All">
+        <listeners>
+          <add name="estl" />
+        </listeners>
+      </source>
+      <source name="System.Net" switchValue="All">
+        <listeners>
+          <add name="estl" />
+        </listeners>
+      </source>
+      <source name="System.ServiceModel" switchValue="All">
+        <listeners>
+          <add name="estl" />
+        </listeners>
+      </source>
+    </sources>
+    </system.diagnostics>
 
-The kibana format of the index is [elknet-]YYYY-MM-DD
+The kibana format of the index is <ElasticSearchTraceIndex>-YYYY-MM-DD
 
 ##Usage
 
-###Exceptions
-
-Now that Elk.NET is configured you can simply use it like
-
-    try
+    Trace.Write("sdgsgsgsgsgsgsgsgsgsgsg");
+    
+    class MyBigFatGreekClass
     {
-        MethodThrowingError();
-    }
-    catch (Exception ex)
-    {
-        ElkLog.Instance.Debug(ex);
-    }
-
-This will log the error to Kibana.
-
-###Trace
-
-To write a trace message to Kibana add te following to the **configuration** section in your config
-
-    <system.diagnostics>
-        <trace autoflush="false" indentsize="4">
-          <listeners>
-            <add name="ElkNET" type="Elk.NET.ElkTraceListner, Elk.Net" />
-            <remove name="Default" />
-          </listeners>
-        </trace>
-      </system.diagnostics>
-      
-Now when to add a trace message to Kiban do the following
-
-    public void Method()
-    {
-        Trace.Write("Method Start");
+        private static readonly TraceSource _traceSource = new TraceSource("alextrace", SourceLevels.Error);
+        public void LoveAndMarriage()
+        {
+            _traceSource.TraceEvent(TraceEventType.Verbose, 0, "is {0} and all is well", DateTime.UtcNow);
+            int x = 0;
+            try
+            {
+                int y = 99999 / x;
+            }
+            catch(Exception ex)
+            {
+                _traceSource.TraceData(TraceEventType.Error, 119999911, ex);
+            }
+        }
         
-        // Do Stuff
-        
-        Trace.Write(Method End");
+        public void DeathAndTaxes()
+        {
+            _traceSource.TraceData(TraceEventType.Warning, 119999911, DateTime.UtcNow);
+        }
     }
-
-##Kibana
-
-Open the your Kibana GUI en use the following config file:
-
-[kibana.json][1]
-
-
-  [1]: https://raw.githubusercontent.com/pmdevers/Elk.NET/master/Elk.NET.Example/kibana.json
