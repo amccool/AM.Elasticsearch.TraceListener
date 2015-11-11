@@ -4,14 +4,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ElasticSearch.Diagnostics.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class ESTLUnitTests
     {
         [TestInitialize]
         public void TestInit()
         {
         }
         [ClassInitialize]
-        public void ClassInit()
+        public static void ClassInit()
         {
         }
 
