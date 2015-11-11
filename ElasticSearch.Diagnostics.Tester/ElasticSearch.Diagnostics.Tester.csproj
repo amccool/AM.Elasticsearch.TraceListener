@@ -11,7 +11,7 @@
     <AssemblyName>ElasticSearch.Diagnostics.Tester</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuSpecFile>Elk.NET.Example.nuspec</NuSpecFile>
+    <NuSpecFile>ElasticSearch.Diagnostics.Tester.nuspec</NuSpecFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
