@@ -5,9 +5,13 @@
     <authors>$author$</authors>
     <owners />
     <id>$id$</id>
-    <title />
+    <title>ElasticSearch.Diagnostics.TraceListener</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
+    <copyright>MIT</copyright>
+    <summary>A TraceListener for submitting trace events and trace data to ElasticSearch</summary>
+    <projectUrl>https://github.com/amccool/ElasticSearch.Diagnostics</projectUrl>
+    <tags>Diagnostics, Trace, TraceListener, ElasticSearch, Kibana</tags>
   </metadata>
   <files />
 </package>
