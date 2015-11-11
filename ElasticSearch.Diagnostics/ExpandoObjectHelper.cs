@@ -6,7 +6,7 @@ using System.Xml.Linq;
 
 namespace ElasticSearch.Diagnostics
 {
-    public class ExpandoObjectHelper
+    class ExpandoObjectHelper
     {
         private static List<string> KnownLists;
         public static void Parse(dynamic parent, XElement node, List<string> knownLists = null)

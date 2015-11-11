@@ -22,11 +22,21 @@ using System.Dynamic;
 
 namespace ElasticSearch.Diagnostics
 {
+    /// <summary>
+    /// A TraceListener class used to submit trace data to elasticsearch
+    /// </summary>
     public class ElasticSearchTraceListener : TraceListenerBase
     {
         private ElasticsearchClient _client;
 
+        /// <summary>
+        /// Uri for the ElasticSearch server
+        /// </summary>
         public Uri Uri { get; private set; }
+
+        /// <summary>
+        /// prefix for the Index for traces
+        /// </summary>
         public string Index { get; private set; }
 
 
@@ -46,6 +56,9 @@ namespace ElasticSearch.Diagnostics
         }
 
 
+        /// <summary>
+        /// Uri for the ElasticSearch server
+        /// </summary>
         public string ElasticSearchUri
         {
             get
@@ -66,6 +79,9 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
+        /// <summary>
+        /// prefix for the Index for traces
+        /// </summary>
         public string ElasticSearchIndex
         {
             get
@@ -87,6 +103,9 @@ namespace ElasticSearch.Diagnostics
         }
 
 
+        /// <summary>
+        /// prefix for the Index for traces
+        /// </summary>
         public string ElasticSearchTraceIndex
         {
             get
