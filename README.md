@@ -4,9 +4,9 @@ ElasticSearch TraceListener is a System.Diagnostics based TraceListener which su
 
 ##Getting Started
 
-Install the package from nu-get http://www.nuget.org/packages/ElasticSearch.Diagnostics/
+Install the package from nu-get https://www.nuget.org/packages/ElasticSearch.Diagnostics/
 
-Install-Package ElasticSearch.Diagnostics.TraceListener
+Install-Package ElasticSearch.Diagnostics
 
 edit your app.config/web.config
 
