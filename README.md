@@ -1,5 +1,15 @@
 # ElasticSearch.Diagnostics
 
+###Pull request builds
+
+[![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics)
+
+###Master build
+
+[![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c/branch/master?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics/branch/master)
+
+
+
 ElasticSearch TraceListener is a System.Diagnostics based TraceListener which submits trace events and data to ElasticSearch making them viewable withKibana
 
 ##Getting Started
