@@ -202,19 +202,6 @@ namespace ElasticSearch.Diagnostics
 
 
 
-            //if ((!string.IsNullOrEmpty(source)) && source.Contains("System.Net")
-            //    &&
-            //    (eventType <= TraceEventType.Verbose)
-            //    )
-            //{
-            //    return;
-            //}
-
-
-
-
-
-
             string updatedMessage = message;
             JObject payload = null;
             if (data != null)
@@ -248,6 +235,11 @@ namespace ElasticSearch.Diagnostics
 
                     string json = JsonConvert.SerializeObject(xmlContent);
                     payload = JObject.Parse(json);
+                }
+                else if (data is DateTime)
+                {
+                    payload = new JObject();
+                    payload.Add("System.DateTime", (DateTime)data);
                 }
                 else
                 {

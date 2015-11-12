@@ -369,7 +369,7 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    WriteTrace(null, null, TraceEventType.Verbose, 0, category, null, new object[] { data });
+                    WriteTrace(null, null, TraceEventType.Verbose, 0, category, null, data);
                 }
             }
         }
