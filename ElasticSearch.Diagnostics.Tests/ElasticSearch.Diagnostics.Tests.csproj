@@ -54,6 +54,15 @@
     <Compile Include="ESTLUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ElasticSearch.Diagnostics\ElasticSearch.Diagnostics.csproj">
+      <Project>{b6efb16c-8fb2-4a19-bf34-312429fff491}</Project>
+      <Name>ElasticSearch.Diagnostics</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
