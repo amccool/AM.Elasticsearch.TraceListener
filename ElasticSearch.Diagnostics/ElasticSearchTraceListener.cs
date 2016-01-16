@@ -223,7 +223,8 @@ namespace ElasticSearch.Diagnostics
             _scribeProcessor = a => WriteToQueueForprocessing(a);
 
             this._queueToBePosted.GetConsumingEnumerable()
-                .ToObservable(Scheduler.Default).Buffer(5)
+                .ToObservable(Scheduler.Default)
+                .Buffer(TimeSpan.FromSeconds(1), 5)
                 .Subscribe(x => this.WriteDirectlyToESAsBatch(x));
         }
 
@@ -345,7 +346,6 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-                //await Client.Raw.IndexAsync(Index, "Trace",
                 var jo = new JObject
                     {
                         {"Source", source },
@@ -364,30 +364,7 @@ namespace ElasticSearch.Diagnostics
                         {"LogicalOperationStack", logicalOperationStack},
                         {"Data", dataObject},
                     };
-                //    .ToString());
 
-                //var te = new TraceEntry
-                //{
-                //    Source = source,
-                //    TraceId = traceId ?? 0,
-                //    EventType = eventType.ToString(),
-                //    UtcDateTime = logTime,
-                //    timestamp = eventCache != null ? eventCache.Timestamp : 0,
-                //    MachineName = Environment.MachineName,
-                //    AppDomainFriendlyName = AppDomain.CurrentDomain.FriendlyName,
-                //    ProcessId = eventCache != null ? eventCache.ProcessId : 0,
-                //    ThreadName = thread,
-                //    ThreadId = threadId,
-                //    Message = message,
-                //    ActivityId = Trace.CorrelationManager.ActivityId != Guid.Empty ? Trace.CorrelationManager.ActivityId.ToString() : string.Empty,
-                //    RelatedActivityId = relatedActivityId.HasValue ? relatedActivityId.Value.ToString() : string.Empty,
-                //    LogicalOperationStack = logicalOperationStack,
-                //    Data = dataObject != null ? dataObject.ToString() : string.Empty
-                //};
-
-                ////WriteToQueueForprocessing(te);
-
-                //WriteDirectlyToES(jo);
                 _scribeProcessor(jo);
             }
             catch (Exception ex)
@@ -398,35 +375,16 @@ namespace ElasticSearch.Diagnostics
 
         private async void WriteDirectlyToES(JObject jo)
         {
-            //var payload = JObject.FromObject(te);
-
-
             var res = await Client.IndexAsync(Index, "Trace", jo.ToString());
-            //var res = Client.Index(Index, "Trace", jo.ToString());
-            //var res = await Client.Raw.IndexAsync<TraceEntry>(Index, "Trace", te);
-
-            //resa.Wait();
-            //var res = resa.Result;
 
             Debug.WriteLine("--------------------");
             Debug.WriteLine(res.ToString());
-            //var res = await Client.IndexAsync(jo, i => i
-            //.Index(Index)
-            //.Type("trace"));
-
-            //Debug.WriteLine(res);
         }
 
         private async void WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
-
-            var x = from o in jos
-                    select
-                    new
-                    {
-                        i = new { index = new { _index = Index, _type = "Trace" } },
-                        trace = o
-                    };
+            if (jos.Count() < 1)
+                return;
 
             var indx = new { index = new { _index = Index, _type = "Trace" } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
@@ -434,51 +392,33 @@ namespace ElasticSearch.Diagnostics
             var bb = jos.Zip(indxC, (f,s)=> new object[] { s, f });
             var bbo = bb.SelectMany(a => a);
 
-            //var bb = new object[jos.Count()*2] { };
-            //foreach (var item in jos)
-            //{
-            //    bb.add
-            //}
-
-            //jos.First().
-
-            //dynamic xmlContent = new ExpandoObject();
-            //ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
-
-            //string json = JsonConvert.SerializeObject(xmlContent);
-            //payload = JObject.Parse(json);
-
-
-            var bulk = new object[]
-            {
-    new { index = new { _index = Index, _type="Trace" }},
-    new
-    {
-        name = "my object's name"
-    },
-    new { index = new { _index = Index, _type="Trace" }},
-    new
-    {
-        name = "my object's name"
-    },
-    new { index = new { _index = Index, _type="Trace" }},
-    new
-    {
-        name = "my object's name"
-    },
-    new { index = new { _index = Index, _type="Trace" }},
-    new
-    {
-        name = "my object's name"
-    },
-            };
-
-
+    //        var bulk = new object[]
+    //        {
+    //new { index = new { _index = Index, _type="Trace" }},
+    //new
+    //{
+    //    name = "my object's name"
+    //},
+    //new { index = new { _index = Index, _type="Trace" }},
+    //new
+    //{
+    //    name = "my object's name"
+    //},
+    //new { index = new { _index = Index, _type="Trace" }},
+    //new
+    //{
+    //    name = "my object's name"
+    //},
+    //new { index = new { _index = Index, _type="Trace" }},
+    //new
+    //{
+    //    name = "my object's name"
+    //},
+    //        };
 
             try
             {
-                var bulkXXXXX = new object[] { x.ToArray() };
-                var res = Client.Bulk(Index, "Trace", bbo.ToArray());
+                var res = await Client.BulkAsync(Index, "Trace", bbo.ToArray());
 
                 Debug.WriteLine("+++++++++++++++++++++++++++");
                 Debug.WriteLine(res.ToString());
@@ -488,86 +428,6 @@ namespace ElasticSearch.Diagnostics
                 Debug.WriteLine(ex);
                 //throw;
             }
-
-
-            //            var bulkX = new object[]
-            //{
-            //    new { index = new { _index = "test", _type="type", _id = "1"  }},
-            //    new
-            //    {
-            //        name = "my object's name"
-            //    }
-            //};
-            //            var bdesc = new BulkDescriptor();
-            //            foreach (var jo in jos)
-            //            {
-            //                bdesc.Index<object>(f =>
-            //                {
-            //                    f.Document(new
-            //                    {
-            //                        name = "my object's name"
-            //                    })
-            //                });
-            //            }
-
-
-            //var x = Client.Bulk(
-            //        var request = new BulkRequest()
-            //        {
-            //            Refresh = true,
-            //            Consistency = Consistency.One,
-            //            Operations = new List<IBulkOperation>
-            //        {
-            //            { new BulkIndexOperation< TraceEntry >(jos.First()) },
-            //    //{ new BulkDeleteOperation< ElasticsearchProject> (6) },
-            //    //{ new BulkCreateOperation< ElasticsearchProject > (project) { Id = "6" } },
-            //    //{ new BulkUpdateOperation< ElasticsearchProject, object>(project, new { Name = "new- project2" }) { Id = "3" }
-            //        },
-            //        };
-
-
-            //var response = Client.Bulk(request);
-
-            //            var result = Client.Bulk(b => b
-            //    .Index<TraceEntry>(i => i
-            //        .Document(jos.First())
-            //    )
-            ////.Create<ElasticSearchProject>(c => c
-            ////    .Document(new ElasticSearchProject { Id = 3 })
-            ////)
-            ////.Delete<ElasticSearchProject>(d => d
-            ////    .Document(new ElasticSearchProject { Id = 4 })
-            ////)
-            //);
-
-
-        }
-
-        private async void WriteDirectlyToESAsBatchX(IEnumerable<JObject> jos)
-        {
-            //await Client.IndexManyAsync(jos, Index, "Trace");
-
-            //var bdesc = new BulkDescriptor();
-            //foreach (var jo in jos)
-            //{
-            //    bdesc.Index<TraceEntry>(i => i
-            //    .Index(Index)
-            //    .Type("Trace")
-            //    //.Id(Guid.NewGuid().ToString())
-            //    .Document(jo));
-
-            //    //Client.Index(Index, "Trace", jo.ToString());
-            //var ir = new IndexRequest<TraceEntry>(jo);
-            //    var bb = Client.Serializer.Serialize(ir);
-            //    //Client.Serializer.Deserialize<dynamic>()
-
-            //}
-
-            ////bdesc.IndexMany(jos, (f,g) => f.Index(Index).Type("Trace"));
-            ////bdesc.
-            //var x = Client.Bulk(bdesc);
-            //Debug.Write(x.ToString());
-
         }
 
         private void WriteToQueueForprocessing(JObject jo)

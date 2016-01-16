@@ -163,6 +163,35 @@ namespace ElasticSearch.Diagnostics.Tests
 
         }
 
+        [TestMethod]
+        public void TSManyWriteExceptionsTest()
+        {
+            var x = new ElasticSearchTraceListener("tester");
+            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchIndex = "trace";
+            x.ElasticSearchTraceIndex = "trace";
+
+            var ts = new TraceSource("exxxxx", SourceLevels.All);
+            ts.Listeners.Add(x);
+
+            try
+            {
+                var n = 0;
+                var y = 100000 / n;
+            }
+            catch (Exception ex)
+            {
+                for (int i = 0; i < 10000; i++)
+                {
+                    ts.TraceData(TraceEventType.Error, 99, ex);
+                }
+            }
+
+
+
+            x.Flush();
+
+        }
 
     }
 }
