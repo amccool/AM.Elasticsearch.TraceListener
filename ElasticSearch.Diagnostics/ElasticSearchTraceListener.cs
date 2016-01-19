@@ -436,12 +436,13 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        public override void Flush()
-        {
-            //check to make sure the "queue" has been emptied
-            while (this._queueToBePosted.Count() > 0)
-            { }
-            base.Flush();
-        }
+        //removing the spin flush
+        //public override void Flush()
+        //{
+        //    //check to make sure the "queue" has been emptied
+        //    while (this._queueToBePosted.Count() > 0)
+        //    { }
+        //    base.Flush();
+        //}
     }
 }
