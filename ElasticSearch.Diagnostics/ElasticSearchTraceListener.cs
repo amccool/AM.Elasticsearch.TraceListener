@@ -375,10 +375,11 @@ namespace ElasticSearch.Diagnostics
 
         private async void WriteDirectlyToES(JObject jo)
         {
-            var res = await Client.IndexAsync(Index, "Trace", jo.ToString());
+            //var res = 
+                await Client.IndexAsync(Index, "Trace", jo.ToString());
 
-            Debug.WriteLine("--------------------");
-            Debug.WriteLine(res.ToString());
+            //Debug.WriteLine("--------------------");
+            //Debug.WriteLine(res.ToString());
         }
 
         private async void WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
@@ -418,10 +419,11 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-                var res = await Client.BulkAsync(Index, "Trace", bbo.ToArray());
+                //var res = 
+                    await Client.BulkAsync(Index, "Trace", bbo.ToArray());
 
-                Debug.WriteLine("+++++++++++++++++++++++++++");
-                Debug.WriteLine(res.ToString());
+                //Debug.WriteLine("+++++++++++++++++++++++++++");
+                //Debug.WriteLine(res.ToString());
             }
             catch (Exception ex)
             {
