@@ -48,7 +48,7 @@ namespace ElasticSearch.Diagnostics
         {
             get
             {
-                return this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
+                return this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
             }
             //private set; }
         }
@@ -92,30 +92,6 @@ namespace ElasticSearch.Diagnostics
                 Attributes["elasticsearchuri"] = value;
             }
         }
-
-        /// <summary>
-        /// prefix for the Index for traces
-        /// </summary>
-        public string ElasticSearchIndex
-        {
-            get
-            {
-                if (Attributes.ContainsKey("elasticsearchindex"))
-                {
-                    return Attributes["elasticsearchindex"];
-                }
-                else
-                {
-                    //return _defaultTemplate;
-                    throw new ArgumentException("elasticsearchindex attribute is not defined");
-                }
-            }
-            set
-            {
-                Attributes["elasticsearchindex"] = value;
-            }
-        }
-
 
         /// <summary>
         /// prefix for the Index for traces
@@ -172,11 +148,11 @@ namespace ElasticSearch.Diagnostics
                     //cs.ExposeRawResponse();
                     //cs.ThrowOnElasticsearchServerExceptions();
 
-                    var cc = new ConnectionConfiguration(Uri);
-                    cc.ThrowOnElasticsearchServerExceptions();
+                    var cc = new ConnectionConfiguration(Uri)
+                        .ThrowOnElasticsearchServerExceptions();
 
-                    this._client = new ElasticsearchClient(cc, null, null, new Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer() );
-                    //this._client = new ElasticClient(cs);
+                    this._client = new ElasticsearchClient(cc,
+                        null, null, new Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer());
                     return this._client;
                 }
             }
@@ -293,7 +269,16 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    payload = JObject.FromObject(data);
+                    try
+                    {
+                        payload = JObject.FromObject(data);
+                    }
+                    catch(JsonSerializationException jEx)
+                    {
+                        payload = new JObject();
+                        payload.Add("FAILURE", jEx.Message);
+                        payload.Add("data", data.GetType().ToString());
+                    }
                 }
             }
 
@@ -303,7 +288,7 @@ namespace ElasticSearch.Diagnostics
             InternalWrite(eventCache, source, eventType, id, updatedMessage, relatedActivityId, payload);
         }
 
-        private async void InternalWrite(
+        private void InternalWrite(
             TraceEventCache eventCache,
             string source,
             TraceEventType eventType,
@@ -373,7 +358,7 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
-        private async void WriteDirectlyToES(JObject jo)
+        private async Task WriteDirectlyToES(JObject jo)
         {
             //var res = 
                 await Client.IndexAsync(Index, "Trace", jo.ToString());
@@ -382,7 +367,7 @@ namespace ElasticSearch.Diagnostics
             //Debug.WriteLine(res.ToString());
         }
 
-        private async void WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
+        private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
             if (jos.Count() < 1)
                 return;
@@ -390,45 +375,16 @@ namespace ElasticSearch.Diagnostics
             var indx = new { index = new { _index = Index, _type = "Trace" } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
-            var bb = jos.Zip(indxC, (f,s)=> new object[] { s, f });
+            var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
             var bbo = bb.SelectMany(a => a);
-
-    //        var bulk = new object[]
-    //        {
-    //new { index = new { _index = Index, _type="Trace" }},
-    //new
-    //{
-    //    name = "my object's name"
-    //},
-    //new { index = new { _index = Index, _type="Trace" }},
-    //new
-    //{
-    //    name = "my object's name"
-    //},
-    //new { index = new { _index = Index, _type="Trace" }},
-    //new
-    //{
-    //    name = "my object's name"
-    //},
-    //new { index = new { _index = Index, _type="Trace" }},
-    //new
-    //{
-    //    name = "my object's name"
-    //},
-    //        };
 
             try
             {
-                //var res = 
-                    await Client.BulkAsync(Index, "Trace", bbo.ToArray());
-
-                //Debug.WriteLine("+++++++++++++++++++++++++++");
-                //Debug.WriteLine(res.ToString());
+                await Client.BulkAsync(Index, "Trace", bbo.ToArray());
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                //throw;
             }
         }
 
@@ -438,13 +394,27 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        //removing the spin flush
-        //public override void Flush()
-        //{
-        //    //check to make sure the "queue" has been emptied
-        //    while (this._queueToBePosted.Count() > 0)
-        //    { }
-        //    base.Flush();
-        //}
+        /// <summary>
+        /// removing the spin flush
+        /// </summary>
+        public override void Flush()
+        {
+            //check to make sure the "queue" has been emptied
+            //while (this._queueToBePosted.Count() > 0)            { }
+            base.Flush();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            this._queueToBePosted.Dispose();
+            base.Flush();
+            base.Dispose(disposing);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

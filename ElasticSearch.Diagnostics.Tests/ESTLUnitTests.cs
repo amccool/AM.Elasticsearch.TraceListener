@@ -1,63 +1,66 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
+using Xunit;
+using System.Net;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
-    [TestClass]
     public class ESTLUnitTests
     {
-        public TestContext TestContext { get; set; }
+        private readonly ITestOutputHelper output;
 
-
-
-        [ClassInitialize()]        //Use ClassInitialize to run code before you run the first test in the class.
-        public static void ci(TestContext tc)
+        public ESTLUnitTests(ITestOutputHelper output)
         {
-            TaskScheduler.UnobservedTaskException += (object sender, UnobservedTaskExceptionEventArgs eventArgs) =>
-            {
-                eventArgs.SetObserved();
-                ((AggregateException)eventArgs.Exception).Handle(ex =>
-                {
-                    Debug.WriteLine("Exception type: {0}", ex.GetType());
-                    return true;
-                });
-            };
+            this.output = output;
         }
 
-        [ClassCleanup()]//        Use ClassCleanup to run code after all tests in a class have run.
-        public static void cc()
-        { }
 
-        [TestInitialize()] //Use TestInitialize to run code before you run each test.
-        public void ti()
-        { }
+        //[ClassInitialize()]        //Use ClassInitialize to run code before you run the first test in the class.
+        //public static void ci(TestContext tc)
+        //{
+        //    TaskScheduler.UnobservedTaskException += (object sender, UnobservedTaskExceptionEventArgs eventArgs) =>
+        //    {
+        //        eventArgs.SetObserved();
+        //        ((AggregateException)eventArgs.Exception).Handle(ex =>
+        //        {
+        //            Debug.WriteLine("Exception type: {0}", ex.GetType());
+        //            return true;
+        //        });
+        //    };
+        //}
 
-        [TestCleanup()] //Use TestCleanup to run code after each test has run.
-        public void tc()
-        {
-            Thread.Sleep(500);
-        }
+        //[ClassCleanup()]//        Use ClassCleanup to run code after all tests in a class have run.
+        //public static void cc()
+        //{ }
 
-        [TestMethod]
+        //[TestInitialize()] //Use TestInitialize to run code before you run each test.
+        //public void ti()
+        //{ }
+
+        //[TestCleanup()] //Use TestCleanup to run code after each test has run.
+        //public void tc()
+        //{
+        //    Thread.Sleep(500);
+        //}
+
+        [Fact]
         public void SimpleWrite()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             x.Write(4);
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteObjectTest()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
 
@@ -69,12 +72,11 @@ namespace ElasticSearch.Diagnostics.Tests
             });
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteExceptionest()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             try
@@ -94,12 +96,11 @@ namespace ElasticSearch.Diagnostics.Tests
 
 
 
-        [TestMethod]
+        [Fact]
         public void ALOTofExmsgs()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 100; i++)
@@ -110,12 +111,11 @@ namespace ElasticSearch.Diagnostics.Tests
             x.Flush();
         }
 
-        [TestMethod]
+        [Fact]
         public void WriteManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 10; i++)
@@ -125,12 +125,11 @@ namespace ElasticSearch.Diagnostics.Tests
             x.Flush();
         }
 
-        [TestMethod]
+        [Fact]
         public void TraceSourceManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -144,12 +143,11 @@ namespace ElasticSearch.Diagnostics.Tests
 
         }
 
-        [TestMethod]
+        [Fact]
         public void TSTestTimeIds()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -163,12 +161,11 @@ namespace ElasticSearch.Diagnostics.Tests
 
         }
 
-        [TestMethod]
+        [Fact]
         public void TSManyWriteExceptionsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
             x.ElasticSearchUri = "http://192.168.2.50:9200";
-            x.ElasticSearchIndex = "trace";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -186,11 +183,36 @@ namespace ElasticSearch.Diagnostics.Tests
                     ts.TraceData(TraceEventType.Error, 99, ex);
                 }
             }
-
-
-
             x.Flush();
+        }
 
+
+
+        class Junk
+        {
+            public IPAddress ipaddr { get; set; }
+        }
+
+        [Fact]
+        public void CauseFailedSerialization()
+        {
+            var x = new ElasticSearchTraceListener("tester");
+            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchTraceIndex = "trace";
+
+            var ts = new TraceSource("exxxxx", SourceLevels.All);
+            ts.Listeners.Add(x);
+
+            for (int i = 0; i < 50; i++)
+            {
+
+            ts.TraceData(TraceEventType.Information, 99, new Junk()
+            {
+                ipaddr = IPAddress.Parse("1.1.1.1")
+            });
+            }
+
+            ts.Flush();
         }
 
     }
