@@ -186,6 +186,22 @@ namespace ElasticSearch.Diagnostics.Tests
             x.Flush();
         }
 
+        [Fact]
+        public void TraceDataWithString()
+        {
+            var x = new ElasticSearchTraceListener("tester");
+            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchTraceIndex = "trace";
+
+            var ts = new TraceSource("exxxxx", SourceLevels.All);
+            ts.Listeners.Add(x);
+
+            ts.TraceData(TraceEventType.Error, 99, "ggggggggggggggggg");
+
+            x.Flush();
+        }
+
+
 
 
         class Junk

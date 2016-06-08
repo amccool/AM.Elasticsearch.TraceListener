@@ -263,6 +263,11 @@ namespace ElasticSearch.Diagnostics
                     payload = new JObject();
                     payload.Add("System.DateTime", (DateTime)data);
                 }
+                else if (data is string)
+                {
+                    payload = new JObject();
+                    payload.Add("string", (string)data);
+                }
                 else if (data.GetType().IsValueType)
                 {
                     payload = new JObject { { "data", data.ToString() } };
