@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xunit.Abstractions;
 using Xunit;
 using System.Net;
+using System.Security.Principal;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
@@ -230,6 +231,27 @@ namespace ElasticSearch.Diagnostics.Tests
 
             ts.Flush();
         }
+
+        //[Fact]
+        //public void IdentityTest()
+        //{
+        //    IPrincipal principal = Thread.CurrentPrincipal;
+        //    IIdentity identity = principal == null ? null : principal.Identity;
+        //    string name = identity == null ? "" : identity.Name;
+
+        //    Assert.False(string.IsNullOrWhiteSpace(name));
+        //}
+
+        [Fact]
+        public void UserNameTest()
+        {
+            string name = Environment.UserDomainName + "\\" + Environment.UserName;
+
+            this.output.WriteLine(name);
+
+            Assert.False(string.IsNullOrWhiteSpace(name));
+        }
+
 
     }
 }

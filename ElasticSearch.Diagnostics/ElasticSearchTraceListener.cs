@@ -22,6 +22,7 @@ using System.Dynamic;
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using System.Security.Principal;
 using Elasticsearch.Net.Connection;
 
 namespace ElasticSearch.Diagnostics
@@ -334,6 +335,16 @@ namespace ElasticSearch.Diagnostics
             string threadId = eventCache != null ? eventCache.ThreadId : string.Empty;
             string thread = Thread.CurrentThread.Name ?? threadId;
 
+
+
+
+            IPrincipal principal = Thread.CurrentPrincipal;
+            IIdentity identity = principal?.Identity;
+            string identityname = identity == null ? string.Empty : identity.Name;
+
+
+            string username = Environment.UserDomainName + "\\" + Environment.UserName;
+
             try
             {
                 var jo = new JObject
@@ -353,6 +364,8 @@ namespace ElasticSearch.Diagnostics
                         {"RelatedActivityId", relatedActivityId.HasValue ? relatedActivityId.Value.ToString() : string.Empty},
                         {"LogicalOperationStack", logicalOperationStack},
                         {"Data", dataObject},
+                        {"Username", username},
+                        {"Identityname", identityname},
                     };
 
                 _scribeProcessor(jo);
