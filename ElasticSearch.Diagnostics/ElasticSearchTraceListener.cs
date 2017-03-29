@@ -49,11 +49,14 @@ namespace ElasticSearch.Diagnostics
 
 
         private static readonly string[] _supportedAttributes = new string[]
-            {
-                "ElasticSearchUri", "elasticSearchUri", "elasticsearchuri",
-                "ElasticSearchIndex", "elasticSearchIndex", "elasticsearchindex",
-                "ElasticSearchTraceIndex", "elasticSearchTraceIndex", "elasticsearchtraceindex",
-            };
+        {
+            "ElasticSearchUri", "elasticSearchUri", "elasticsearchuri",
+            "ElasticSearchTraceIndex", "elasticSearchTraceIndex", "elasticsearchtraceindex",
+
+            //this attribute is to be removed next minor release
+            "ElasticSearchIndex", "elasticSearchIndex", "elasticsearchindex",
+
+        };
 
         /// <summary>
         /// Allowed attributes for this trace listener.
@@ -78,7 +81,7 @@ namespace ElasticSearch.Diagnostics
                 else
                 {
                     //return _defaultTemplate;
-                    throw new ArgumentException("elasticsearchuri attribute is not defined");
+                    throw new ArgumentException($"{nameof(ElasticSearchUri)} attribute is not defined");
                 }
             }
             set
@@ -101,7 +104,7 @@ namespace ElasticSearch.Diagnostics
                 else
                 {
                     //return _defaultTemplate;
-                    throw new ArgumentException("elasticsearchtraceindex attribute is not defined");
+                    throw new ArgumentException($"{nameof(ElasticSearchTraceIndex)} attribute is not defined");
                 }
             }
             set
@@ -116,13 +119,7 @@ namespace ElasticSearch.Diagnostics
         /// Gets a value indicating the trace listener is thread safe.
         /// </summary>
         /// <value>true</value>
-        public override bool IsThreadSafe
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsThreadSafe => true;
 
         public ElasticsearchClient Client
         //public ElasticClient Client
