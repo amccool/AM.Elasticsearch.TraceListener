@@ -22,6 +22,7 @@ using System.Dynamic;
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using System.Security.Principal;
 using Elasticsearch.Net.Connection;
 
 namespace ElasticSearch.Diagnostics
@@ -39,19 +40,12 @@ namespace ElasticSearch.Diagnostics
         /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
-        public Uri Uri { get; private set; }
+        private Uri Uri { get; set; }
 
         /// <summary>
         /// prefix for the Index for traces
         /// </summary>
-        public string Index
-        {
-            get
-            {
-                return this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
-            }
-            //private set; }
-        }
+        private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
 
 
         private static readonly string[] _supportedAttributes = new string[]
@@ -334,6 +328,16 @@ namespace ElasticSearch.Diagnostics
             string threadId = eventCache != null ? eventCache.ThreadId : string.Empty;
             string thread = Thread.CurrentThread.Name ?? threadId;
 
+
+
+
+            IPrincipal principal = Thread.CurrentPrincipal;
+            IIdentity identity = principal?.Identity;
+            string identityname = identity == null ? string.Empty : identity.Name;
+
+
+            string username = Environment.UserDomainName + "\\" + Environment.UserName;
+
             try
             {
                 var jo = new JObject
@@ -353,6 +357,8 @@ namespace ElasticSearch.Diagnostics
                         {"RelatedActivityId", relatedActivityId.HasValue ? relatedActivityId.Value.ToString() : string.Empty},
                         {"LogicalOperationStack", logicalOperationStack},
                         {"Data", dataObject},
+                        {"Username", username},
+                        {"Identityname", identityname},
                     };
 
                 _scribeProcessor(jo);
