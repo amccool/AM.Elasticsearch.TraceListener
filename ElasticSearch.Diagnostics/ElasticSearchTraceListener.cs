@@ -40,19 +40,12 @@ namespace ElasticSearch.Diagnostics
         /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
-        public Uri Uri { get; private set; }
+        private Uri Uri { get; set; }
 
         /// <summary>
         /// prefix for the Index for traces
         /// </summary>
-        public string Index
-        {
-            get
-            {
-                return this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
-            }
-            //private set; }
-        }
+        private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
 
 
         private static readonly string[] _supportedAttributes = new string[]
