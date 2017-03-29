@@ -53,7 +53,7 @@ edit your app.config/web.config
     </sources>
     </system.diagnostics>
 
-The kibana format of the index is <ElasticSearchTraceIndex>-YYYY-MM-DD-HH
+The kibana format of the index is <ElasticSearchTraceIndex>-yyyy-MM-dd-HH
 
 ## Usage
 
