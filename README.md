@@ -1,5 +1,13 @@
 # ElasticSearch.Diagnostics
 
+## 1.1 Release Notes
+
+the attribute 
+                `ElasticSearchIndex`
+is redundant, its value is ignored.   Next minor release it will be removed, which will cause a runtime failure at the first usage of the listener
+
+
+
 ### Pull request builds
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics)
@@ -9,15 +17,15 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c/branch/master?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics/branch/master)
 
 
-ElasticSearch TraceListener is a System.Diagnostics based TraceListener which submits trace events and data to ElasticSearch making them viewable withKibana
+ElasticSearch TraceListener is a System.Diagnostics based TraceListener which submits trace events and data to ElasticSearch making them viewable with Kibana
 
 ## Getting Started
 
-[![NuGet Status](http://nugetstatus.com/ElasticSearch.Diagnostics.png)](http://nugetstatus.com/packages/ElasticSearch.Diagnostics)
+Install the package from nuget.org https://www.nuget.org/packages/ElasticSearch.Diagnostics/
 
-Install the package from nu-get https://www.nuget.org/packages/ElasticSearch.Diagnostics/
-
+```ps
 Install-Package ElasticSearch.Diagnostics
+```
 
 edit your app.config/web.config
 
@@ -25,7 +33,7 @@ edit your app.config/web.config
         <sharedListeners>
             <add name="estl" type="ElasticSearch.Diagnostics.ElasticSearchTraceListener, ElasticSearch.Diagnostics"
                 ElasticSearchUri="http://127.1.1.1:9200"
-                ElasticSearchIndex="trace"
+                ElasticSearchTraceIndex="trace"
             />
         </sharedListeners>
         <trace autoflush="false" indentsize="4">
