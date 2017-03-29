@@ -1,18 +1,17 @@
 # ElasticSearch.Diagnostics
 
-###Pull request builds
+### Pull request builds
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics)
 
-###Master build
+### Master build
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c/branch/master?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics/branch/master)
 
 
-
 ElasticSearch TraceListener is a System.Diagnostics based TraceListener which submits trace events and data to ElasticSearch making them viewable withKibana
 
-##Getting Started
+## Getting Started
 
 [![NuGet Status](http://nugetstatus.com/ElasticSearch.Diagnostics.png)](http://nugetstatus.com/packages/ElasticSearch.Diagnostics)
 
@@ -27,7 +26,6 @@ edit your app.config/web.config
             <add name="estl" type="ElasticSearch.Diagnostics.ElasticSearchTraceListener, ElasticSearch.Diagnostics"
                 ElasticSearchUri="http://127.1.1.1:9200"
                 ElasticSearchIndex="trace"
-                ElasticSearchTraceIndex="trace"
             />
         </sharedListeners>
         <trace autoflush="false" indentsize="4">
@@ -55,9 +53,9 @@ edit your app.config/web.config
     </sources>
     </system.diagnostics>
 
-The kibana format of the index is <ElasticSearchTraceIndex>-YYYY-MM-DD
+The kibana format of the index is <ElasticSearchTraceIndex>-YYYY-MM-DD-HH
 
-##Usage
+## Usage
 
     Trace.Write("sdgsgsgsgsgsgsgsgsgsgsg");
     
@@ -83,3 +81,38 @@ The kibana format of the index is <ElasticSearchTraceIndex>-YYYY-MM-DD
             _traceSource.TraceData(TraceEventType.Warning, 119999911, DateTime.UtcNow);
         }
     }
+
+
+
+## Environmental setup
+
+You need an ElasticSearch host, and likely you want Kibana to view the data
+
+### setup your ElasticSearch host
+
+try using docker
+
+see https://elk-docker.readthedocs.io/
+
+```bash
+$ sudo docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/elk
+```
+
+### Run your traces to generate some data
+
+Elasticsearch and Kibana needs some data to get started with
+
+### Configure ElasticSearch and Kibana
+
+Note that `trace` was used for the index prefix
+
+go the kibana managment page
+http://192.168.1.1:5601/app/kibana#/management
+
+click index patterns
+http://192.168.1.1:5601/app/kibana#/management/kibana/indices
+
+click +Add New
+type in the prefix you used (see above) `trace` adding a `dash`
+
+if you have data in ElasticSearch then it will display a Date field, which will be `UtcDateTime`
