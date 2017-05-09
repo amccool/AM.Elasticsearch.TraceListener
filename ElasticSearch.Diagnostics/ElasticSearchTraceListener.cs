@@ -143,6 +143,7 @@ namespace ElasticSearch.Diagnostics
                     //cs.ThrowOnElasticsearchServerExceptions();
 
                     var cc = new ConnectionConfiguration(Uri)
+                        .HttpPipeliningEnabled()
                         .ThrowOnElasticsearchServerExceptions();
 
                     this._client = new ElasticsearchClient(cc,
