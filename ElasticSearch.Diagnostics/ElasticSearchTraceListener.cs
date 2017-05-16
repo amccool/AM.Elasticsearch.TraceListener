@@ -144,7 +144,8 @@ namespace ElasticSearch.Diagnostics
 
 					var singleNode = new SingleNodeConnectionPool(Uri);
 
-					var cc = new ConnectionConfiguration(singleNode, connectionSettings => new ElasticsearchJsonNetSerializer())
+	                var cc = new ConnectionConfiguration(singleNode,
+			                connectionSettings => new ElasticsearchJsonNetSerializer())
 		                .EnableHttpPipelining()
 		                .ThrowExceptions();
 
@@ -199,8 +200,8 @@ namespace ElasticSearch.Diagnostics
 
             this._queueToBePosted.GetConsumingEnumerable()
                 .ToObservable(Scheduler.Default)
-                .Buffer(TimeSpan.FromSeconds(1), 5)
-                .Subscribe(x => this.WriteDirectlyToESAsBatch(x));
+                .Buffer(TimeSpan.FromSeconds(1), 10)
+                .Subscribe(async x => await this.WriteDirectlyToESAsBatch(x));
         }
 
 
@@ -378,8 +379,7 @@ namespace ElasticSearch.Diagnostics
         {
 	        try
 	        {
-                var x = await Client.IndexAsync<string>(Index, "Trace", jo.ToString());
-		        Debug.WriteLine(x);
+                await Client.IndexAsync<VoidResponse>(Index, "Trace", jo.ToString());
 	        }
 	        catch (Exception ex)
 	        {
@@ -400,8 +400,7 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-                var x = await Client.BulkAsync<string>(Index, "Trace", bbo.ToArray());
-				Debug.WriteLine(x);
+	            await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
