@@ -23,7 +23,9 @@ using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Security.Principal;
-using Elasticsearch.Net.Connection;
+using ElasticSearch.Diagnostics.Serialization;
+
+//using Elasticsearch.Net.Connection;
 
 namespace ElasticSearch.Diagnostics
 {
@@ -34,8 +36,7 @@ namespace ElasticSearch.Diagnostics
     {
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
 
-        private ElasticsearchClient _client;
-        //private ElasticClient _client;
+        private IElasticLowLevelClient _client;
 
         /// <summary>
         /// Uri for the ElasticSearch server
@@ -124,8 +125,7 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
-        public ElasticsearchClient Client
-        //public ElasticClient Client
+        public IElasticLowLevelClient Client
         {
             get
             {
@@ -137,23 +137,27 @@ namespace ElasticSearch.Diagnostics
                 {
                     Uri = new Uri(this.ElasticSearchUri);
 
-                    //Index = this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
-                    //var cs = new ConnectionSettings(Uri);
-                    //cs.ExposeRawResponse();
-                    //cs.ThrowOnElasticsearchServerExceptions();
+					//Index = this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
+					//var cs = new ConnectionSettings(Uri);
+					//cs.ExposeRawResponse();
+					//cs.ThrowOnElasticsearchServerExceptions();
 
-                    var cc = new ConnectionConfiguration(Uri)
-                        .HttpPipeliningEnabled()
-                        .ThrowOnElasticsearchServerExceptions();
+					var singleNode = new SingleNodeConnectionPool(Uri);
 
-                    this._client = new ElasticsearchClient(cc,
-                        null, null, new Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer());
+					var cc = new ConnectionConfiguration(singleNode, connectionSettings => new ElasticsearchJsonNetSerializer())
+		                .EnableHttpPipelining()
+		                .ThrowExceptions();
+
+					//the 1.x serializer we needed to use, as the default SimpleJson didnt work right
+					//Elasticsearch.Net.JsonNet.ElasticsearchJsonNetSerializer()
+
+	                this._client = new ElasticLowLevelClient(cc);
                     return this._client;
                 }
             }
         }
 
-        /// <summary>
+	    /// <summary>
         /// We cant grab any of the attributes until the class and more importantly its base class has finsihed initializing
         /// so keep the constructor at a minimum
         /// </summary>
@@ -214,7 +218,7 @@ namespace ElasticSearch.Diagnostics
             object data)
         {
 
-            if (eventCache != null && eventCache.Callstack.Contains("Elasticsearch.Net.ElasticsearchClient"))
+            if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
             {
                 return;
             }
@@ -372,12 +376,16 @@ namespace ElasticSearch.Diagnostics
 
         private async Task WriteDirectlyToES(JObject jo)
         {
-            //var res = 
-                await Client.IndexAsync(Index, "Trace", jo.ToString());
-
-            //Debug.WriteLine("--------------------");
-            //Debug.WriteLine(res.ToString());
-        }
+	        try
+	        {
+                var x = await Client.IndexAsync<string>(Index, "Trace", jo.ToString());
+		        Debug.WriteLine(x);
+	        }
+	        catch (Exception ex)
+	        {
+		        Debug.WriteLine(ex);
+	        }
+		}
 
         private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
@@ -392,7 +400,8 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-                await Client.BulkAsync(Index, "Trace", bbo.ToArray());
+                var x = await Client.BulkAsync<string>(Index, "Trace", bbo.ToArray());
+				Debug.WriteLine(x);
             }
             catch (Exception ex)
             {
