@@ -88,17 +88,7 @@ namespace ElasticSearch.Diagnostics.Tester
             }
 
 
-			//log a ALOT of entries for a preformance test
-			Stopwatch sw = Stopwatch.StartNew();
-	        for (int i = 0; i < 50000; i++)
-	        {
-		        _traceSource.TraceEvent( TraceEventType.Information, i, $"an event happened! at {sw.ElapsedMilliseconds}ms");
-	        }
-			sw.Stop();
-	        _traceSource.TraceEvent(TraceEventType.Information, 0, $"total in program time for {5000} evnts tooks {sw.ElapsedMilliseconds}ms");
-
-
-			Console.ReadLine();
+	        Console.ReadLine();
         }
 
 
