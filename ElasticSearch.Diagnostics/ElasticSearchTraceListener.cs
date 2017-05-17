@@ -34,7 +34,12 @@ namespace ElasticSearch.Diagnostics
     /// </summary>
     public class ElasticSearchTraceListener : TraceListenerBase
     {
-        private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
+		//default
+	    private const int BUFFER_SIZE = 50;
+	    private const int BUFFER_WAIT_SECONDS = 1;
+	    private const string DEFAULT_DATE_PATTERN = "yyyy-MM-dd-HH";
+
+		private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
 
         private IElasticLowLevelClient _client;
 
@@ -43,18 +48,26 @@ namespace ElasticSearch.Diagnostics
         /// </summary>
         private Uri Uri { get; set; }
 
-        /// <summary>
-        /// prefix for the Index for traces
-        /// </summary>
-        private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
+	    private string ElasticSearchTraceIndex { get; set; }
+	    private string ElasticSearchIndexDatePattern { get; set; }
 
 
-        private static readonly string[] _supportedAttributes = new string[]
-            {
-                "ElasticSearchUri", "elasticSearchUri", "elasticsearchuri",
-                "ElasticSearchIndex", "elasticSearchIndex", "elasticsearchindex",
-                "ElasticSearchTraceIndex", "elasticSearchTraceIndex", "elasticsearchtraceindex",
-            };
+
+		/// <summary>
+		/// prefix for the Index for traces
+		/// </summary>
+		private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString(this.ElasticSearchIndexDatePattern);
+
+
+	    private static readonly string[] _supportedAttributes = new string[]
+	    {
+		    "ElasticSearchUri", "elasticSearchUri", "elasticsearchuri",
+		    "ElasticSearchIndex", "elasticSearchIndex", "elasticsearchindex",
+		    "ElasticSearchTraceIndex", "elasticSearchTraceIndex", "elasticsearchtraceindex",
+		    "BufferSize", "bufferSize", "buffersize",
+		    "BufferWaitSeconds", "bufferWaitSeconds", "bufferwaitseconds",
+		    "ElasticSearchIndexDatePattern", "elasticSearchIndexDatePattern", "elasticsearchindexdatepattern",
+	    };
 
         /// <summary>
         /// Allowed attributes for this trace listener.
@@ -68,7 +81,7 @@ namespace ElasticSearch.Diagnostics
         /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
-        public string ElasticSearchUri
+        public string ElasticSearchUriAttribute
         {
             get
             {
@@ -89,10 +102,32 @@ namespace ElasticSearch.Diagnostics
         }
 
         /// <summary>
+        /// Uri for the ElasticSearch server
+        /// </summary>
+        public string ElasticSearchIndexDatePatternAttribute
+		{
+            get
+            {
+                if (Attributes.ContainsKey("elasticsearchindexdatepattern"))
+                {
+                    return Attributes["elasticsearchindexdatepattern"];
+                }
+                else
+                {
+                    return DEFAULT_DATE_PATTERN;
+                }
+            }
+            set
+            {
+                Attributes["elasticsearchindexdatepattern"] = value;
+            }
+        }
+
+        /// <summary>
         /// prefix for the Index for traces
         /// </summary>
-        public string ElasticSearchTraceIndex
-        {
+        public string ElasticSearchTraceIndexAttribute
+		{
             get
             {
                 if (Attributes.ContainsKey("elasticsearchtraceindex"))
@@ -101,8 +136,7 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    //return _defaultTemplate;
-                    throw new ArgumentException("elasticsearchtraceindex attribute is not defined");
+	                return @"trace";
                 }
             }
             set
@@ -111,13 +145,57 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
+		/// <summary>
+		/// BufferSize for number of traces to buffer
+		/// </summary>
+		public int BufferSizeAttribute
+		{
+		    get
+		    {
+			    if (Attributes.ContainsKey("buffersize"))
+			    {
+				    return int.Parse( Attributes["buffersize"]);
+			    }
+			    else
+			    {
+				    return BUFFER_SIZE;
+			    }
+		    }
+		    set
+		    {
+			    Attributes["buffersize"] = value.ToString();
+		    }
+	    }
+
+		/// <summary>
+		/// BufferSize for number of traces to buffer
+		/// </summary>
+		public int BufferWaitSecondsAttribute
+		{
+		    get
+		    {
+			    if (Attributes.ContainsKey("bufferwaitseconds"))
+			    {
+				    return int.Parse( Attributes["bufferwaitseconds"]);
+			    }
+			    else
+			    {
+				    return BUFFER_WAIT_SECONDS;
+			    }
+		    }
+		    set
+		    {
+			    Attributes["bufferwaitseconds"] = value.ToString();
+		    }
+	    }
 
 
-        /// <summary>
-        /// Gets a value indicating the trace listener is thread safe.
-        /// </summary>
-        /// <value>true</value>
-        public override bool IsThreadSafe
+
+		/// <summary>
+		/// Gets a value indicating the trace listener is thread safe.
+		/// </summary>
+		/// <value>true</value>
+		public override bool IsThreadSafe
         {
             get
             {
@@ -125,7 +203,7 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
-        public IElasticLowLevelClient Client
+        private IElasticLowLevelClient Client
         {
             get
             {
@@ -135,7 +213,7 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    Uri = new Uri(this.ElasticSearchUri);
+                    Uri = new Uri(this.ElasticSearchUriAttribute);
 
 					//Index = this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
 					//var cs = new ConnectionSettings(Uri);
@@ -178,8 +256,19 @@ namespace ElasticSearch.Diagnostics
 
         private void Initialize()
         {
+	        var bufferSize = this.BufferSizeAttribute;
+	        var bufferTime = TimeSpan.FromSeconds(this.BufferWaitSecondsAttribute);
+
+	        this.ElasticSearchTraceIndex = this.ElasticSearchTraceIndexAttribute;
+	        this.ElasticSearchIndexDatePattern = this.ElasticSearchIndexDatePatternAttribute;
+
+			//test the formatter, and blow
+	        var test = this.Index;
+
+			//TODO - make sure this is a valid
+
             //SetupObserver();
-            SetupObserverBatchy();
+            SetupObserverBatchy(bufferTime, bufferSize);
         }
 
         private Action<JObject> _scribeProcessor;
@@ -194,13 +283,13 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        private void SetupObserverBatchy()
+        private void SetupObserverBatchy(TimeSpan waittime, int size)
         {
             _scribeProcessor = a => WriteToQueueForprocessing(a);
 
             this._queueToBePosted.GetConsumingEnumerable()
                 .ToObservable(Scheduler.Default)
-                .Buffer(TimeSpan.FromSeconds(1), 10)
+                .Buffer(waittime, size)
                 .Subscribe(async x => await this.WriteDirectlyToESAsBatch(x));
         }
 
