@@ -21,6 +21,9 @@ ElasticSearch TraceListener is a System.Diagnostics based TraceListener which su
 
 ## Getting Started
 
+[![nuget downloads](https://img.shields.io/nuget/dt/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
+[![nuget version](https://img.shields.io/nuget/v/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
+
 Install the package from nuget.org https://www.nuget.org/packages/ElasticSearch.Diagnostics/
 
 ```ps
