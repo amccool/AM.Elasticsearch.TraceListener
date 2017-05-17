@@ -78,7 +78,13 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        /// <summary>
+	    public override object InitializeLifetimeService()
+	    {
+		    return base.InitializeLifetimeService();
+	    }
+
+
+	    /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
         public string ElasticSearchUriAttribute
