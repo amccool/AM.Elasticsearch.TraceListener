@@ -23,6 +23,14 @@ namespace ElasticSearch.Diagnostics.Tester
         private static readonly TraceSource _traceSource = new TraceSource("alextrace", SourceLevels.Error);
         static void Main(string[] args)
         {
+	        var ub = new UriBuilder("http://rb-es.northcentralus.cloudapp.azure.com:9200");
+	        ub.UserName = HttpUtility.UrlEncode("elastic");
+	        ub.Password = HttpUtility.UrlEncode("sY,H]J#nG9/hB4}4");
+
+			Console.WriteLine(ub.Uri);
+
+
+
 
 
             var s = new Stuff()
@@ -79,6 +87,8 @@ namespace ElasticSearch.Diagnostics.Tester
                 //throw;
             }
 
+
+	        Console.ReadLine();
         }
 
 

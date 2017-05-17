@@ -51,7 +51,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void SimpleWrite()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             x.Write(4);
@@ -61,7 +61,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void WriteObjectTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
 
@@ -77,7 +77,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void WriteExceptionest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             try
@@ -101,7 +101,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void ALOTofExmsgs()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 100; i++)
@@ -116,7 +116,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void WriteManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 10; i++)
@@ -130,7 +130,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void TraceSourceManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -148,13 +148,13 @@ namespace ElasticSearch.Diagnostics.Tests
         public void TSTestTimeIds()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
             ts.Listeners.Add(x);
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 ts.TraceEvent(TraceEventType.Error, 1000, DateTime.Now.ToString());
             }
@@ -166,7 +166,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void TSManyWriteExceptionsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -191,7 +191,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void TraceDataWithString()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -214,7 +214,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public void CauseFailedSerialization()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.2.50:9200";
+            x.ElasticSearchUri = "http://192.168.204.198:9200";
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
