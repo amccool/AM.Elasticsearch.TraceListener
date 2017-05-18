@@ -223,10 +223,10 @@ namespace ElasticSearch.Diagnostics
             object data)
         {
 
-            if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
-            {
-                return;
-            }
+            //if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
+            //{
+            //    return;
+            //}
 
             string updatedMessage = message;
             JObject payload = null;
