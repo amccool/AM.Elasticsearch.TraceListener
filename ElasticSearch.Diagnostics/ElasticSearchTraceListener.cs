@@ -301,10 +301,10 @@ namespace ElasticSearch.Diagnostics
             JObject dataObject)
         {
 
-            var timeStamp = DateTime.UtcNow.ToString("o");
+            //var timeStamp = DateTime.UtcNow.ToString("o");
             //var source = Process.GetCurrentProcess().ProcessName;
-            var stacktrace = Environment.StackTrace;
-            var methodName = (new StackTrace()).GetFrame(StackTrace.METHODS_TO_SKIP + 4).GetMethod().Name;
+            //var stacktrace = Environment.StackTrace;
+            //var methodName = (new StackTrace()).GetFrame(StackTrace.METHODS_TO_SKIP + 4).GetMethod().Name;
 
 
             DateTime logTime;
@@ -349,10 +349,10 @@ namespace ElasticSearch.Diagnostics
                         {"TraceId", traceId ?? 0},
                         {"EventType", eventType.ToString()},
                         {"UtcDateTime", logTime},
-                        {"timestamp", eventCache != null ? eventCache.Timestamp : 0},
+                        {"timestamp", eventCache?.Timestamp ?? 0},
                         {"MachineName", Environment.MachineName},
                         {"AppDomainFriendlyName", AppDomain.CurrentDomain.FriendlyName},
-                        {"ProcessId", eventCache != null ? eventCache.ProcessId : 0},
+                        {"ProcessId", eventCache?.ProcessId ?? 0},
                         {"ThreadName", thread},
                         {"ThreadId", threadId},
                         {"Message", message},
