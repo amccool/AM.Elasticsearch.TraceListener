@@ -166,6 +166,7 @@ namespace ElasticSearch.Diagnostics
 	    {
 	        _userDomainName = Environment.UserDomainName;
 	        _userName = Environment.UserName;
+	        _machineName = Environment.MachineName;
             Initialize();
         }
 
@@ -177,6 +178,7 @@ namespace ElasticSearch.Diagnostics
         {
             _userDomainName = Environment.UserDomainName;
             _userName = Environment.UserName;
+            _machineName = Environment.MachineName;
             Initialize();
         }
 
@@ -187,6 +189,7 @@ namespace ElasticSearch.Diagnostics
         }
 
         private Action<JObject> _scribeProcessor;
+        private string _machineName;
 
         private void SetupObserver()
         {
@@ -357,7 +360,7 @@ namespace ElasticSearch.Diagnostics
                         {"EventType", eventType.ToString()},
                         {"UtcDateTime", logTime},
                         {"timestamp", eventCache?.Timestamp ?? 0},
-                        {"MachineName", Environment.MachineName},
+                        {"MachineName", _machineName},
                         {"AppDomainFriendlyName", AppDomain.CurrentDomain.FriendlyName},
                         {"ProcessId", eventCache?.ProcessId ?? 0},
                         {"ThreadName", thread},
