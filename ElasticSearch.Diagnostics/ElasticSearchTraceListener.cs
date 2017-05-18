@@ -38,6 +38,9 @@ namespace ElasticSearch.Diagnostics
 
         private IElasticLowLevelClient _client;
 
+        private string _userDomainName;
+        private string _userName;
+
         /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
@@ -160,7 +163,9 @@ namespace ElasticSearch.Diagnostics
         /// so keep the constructor at a minimum
         /// </summary>
         public ElasticSearchTraceListener() : base()
-        {
+	    {
+	        _userDomainName = Environment.UserDomainName;
+	        _userName = Environment.UserName;
             Initialize();
         }
 
@@ -170,6 +175,8 @@ namespace ElasticSearch.Diagnostics
         /// </summary>
         public ElasticSearchTraceListener(string name) : base(name)
         {
+            _userDomainName = Environment.UserDomainName;
+            _userName = Environment.UserName;
             Initialize();
         }
 
@@ -338,8 +345,8 @@ namespace ElasticSearch.Diagnostics
             IIdentity identity = principal?.Identity;
             string identityname = identity == null ? string.Empty : identity.Name;
 
-
-            string username = Environment.UserDomainName + "\\" + Environment.UserName;
+            
+            string username = $"{_userDomainName}\\{_userName}";
 
             try
             {
