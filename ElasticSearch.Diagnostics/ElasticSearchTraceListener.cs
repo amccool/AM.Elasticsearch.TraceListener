@@ -38,6 +38,9 @@ namespace ElasticSearch.Diagnostics
 
         private IElasticLowLevelClient _client;
 
+        private string _userDomainName;
+        private string _userName;
+
         /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
@@ -160,7 +163,10 @@ namespace ElasticSearch.Diagnostics
         /// so keep the constructor at a minimum
         /// </summary>
         public ElasticSearchTraceListener() : base()
-        {
+	    {
+	        _userDomainName = Environment.UserDomainName;
+	        _userName = Environment.UserName;
+	        _machineName = Environment.MachineName;
             Initialize();
         }
 
@@ -170,6 +176,9 @@ namespace ElasticSearch.Diagnostics
         /// </summary>
         public ElasticSearchTraceListener(string name) : base(name)
         {
+            _userDomainName = Environment.UserDomainName;
+            _userName = Environment.UserName;
+            _machineName = Environment.MachineName;
             Initialize();
         }
 
@@ -180,6 +189,7 @@ namespace ElasticSearch.Diagnostics
         }
 
         private Action<JObject> _scribeProcessor;
+        private string _machineName;
 
         private void SetupObserver()
         {
@@ -216,10 +226,10 @@ namespace ElasticSearch.Diagnostics
             object data)
         {
 
-            if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
-            {
-                return;
-            }
+            //if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
+            //{
+            //    return;
+            //}
 
             string updatedMessage = message;
             JObject payload = null;
@@ -301,10 +311,10 @@ namespace ElasticSearch.Diagnostics
             JObject dataObject)
         {
 
-            var timeStamp = DateTime.UtcNow.ToString("o");
+            //var timeStamp = DateTime.UtcNow.ToString("o");
             //var source = Process.GetCurrentProcess().ProcessName;
-            var stacktrace = Environment.StackTrace;
-            var methodName = (new StackTrace()).GetFrame(StackTrace.METHODS_TO_SKIP + 4).GetMethod().Name;
+            //var stacktrace = Environment.StackTrace;
+            //var methodName = (new StackTrace()).GetFrame(StackTrace.METHODS_TO_SKIP + 4).GetMethod().Name;
 
 
             DateTime logTime;
@@ -338,8 +348,8 @@ namespace ElasticSearch.Diagnostics
             IIdentity identity = principal?.Identity;
             string identityname = identity == null ? string.Empty : identity.Name;
 
-
-            string username = Environment.UserDomainName + "\\" + Environment.UserName;
+            
+            string username = $"{_userDomainName}\\{_userName}";
 
             try
             {
@@ -349,10 +359,10 @@ namespace ElasticSearch.Diagnostics
                         {"TraceId", traceId ?? 0},
                         {"EventType", eventType.ToString()},
                         {"UtcDateTime", logTime},
-                        {"timestamp", eventCache != null ? eventCache.Timestamp : 0},
-                        {"MachineName", Environment.MachineName},
+                        {"timestamp", eventCache?.Timestamp ?? 0},
+                        {"MachineName", _machineName},
                         {"AppDomainFriendlyName", AppDomain.CurrentDomain.FriendlyName},
-                        {"ProcessId", eventCache != null ? eventCache.ProcessId : 0},
+                        {"ProcessId", eventCache?.ProcessId ?? 0},
                         {"ThreadName", thread},
                         {"ThreadId", threadId},
                         {"Message", message},
