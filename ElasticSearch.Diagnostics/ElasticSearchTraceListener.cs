@@ -407,7 +407,7 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-	            await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(false));
+	            await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(Refresh.False));
             }
             catch (Exception ex)
             {
