@@ -54,6 +54,8 @@ namespace ElasticSearch.Diagnostics
 
         private static readonly string[] _supportedAttributes = new string[]
         {
+            "AppDomainFriendlyName", "appDomainFriendlyName", "appDomainFriendlyName",
+
             "ElasticSearchUri", "elasticSearchUri", "elasticsearchuri",
             "ElasticSearchTraceIndex", "elasticSearchTraceIndex", "elasticsearchtraceindex",
 
@@ -91,6 +93,25 @@ namespace ElasticSearch.Diagnostics
             set
             {
                 Attributes["elasticsearchuri"] = value;
+            }
+        }
+
+        public string AppDomainFriendlyName
+        {
+            get
+            {
+                if (Attributes.ContainsKey("appdomainfriendlyname"))
+                {
+                    return Attributes["appdomainfriendlyname"];
+                }
+                else
+                {
+                    return AppDomain.CurrentDomain.FriendlyName;
+                }
+            }
+            set
+            {
+                Attributes["appDomainFriendlyName"] = value;
             }
         }
 
@@ -361,7 +382,7 @@ namespace ElasticSearch.Diagnostics
                         {"UtcDateTime", logTime},
                         {"timestamp", eventCache?.Timestamp ?? 0},
                         {"MachineName", _machineName},
-                        {"AppDomainFriendlyName", AppDomain.CurrentDomain.FriendlyName},
+                        {"AppDomainFriendlyName", AppDomainFriendlyName},
                         {"ProcessId", eventCache?.ProcessId ?? 0},
                         {"ThreadName", thread},
                         {"ThreadId", threadId},
