@@ -1,31 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-using Elasticsearch.Net;
-
-//using Nest;
-
-using Newtonsoft.Json.Linq;
-using System.Threading;
-using System.Xml.XPath;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.Xml.Linq;
-using System.Xml;
-using System.Dynamic;
-using System.Collections.Concurrent;
-using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using System.Security.Principal;
+﻿using Elasticsearch.Net;
 using ElasticSearch.Diagnostics.Serialization;
-
-//using Elasticsearch.Net.Connection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Dynamic;
+using System.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Security.Principal;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ElasticSearch.Diagnostics
 {
@@ -386,7 +376,7 @@ namespace ElasticSearch.Diagnostics
         {
 	        try
 	        {
-                await Client.IndexAsync<VoidResponse>(Index, "Trace", jo.ToString());
+                await Client.IndexAsync<VoidResponse>(Index, "_doc", jo.ToString());
 	        }
 	        catch (Exception ex)
 	        {
@@ -396,10 +386,10 @@ namespace ElasticSearch.Diagnostics
 
         private async Task WriteDirectlyToESAsBatch(IEnumerable<JObject> jos)
         {
-            if (jos.Count() < 1)
+            if (!jos.Any())
                 return;
 
-            var indx = new { index = new { _index = Index, _type = "Trace" } };
+            var indx = new { index = new { _index = Index, _type = "_doc" } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
@@ -407,7 +397,7 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-	            await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(false));
+	            await Client.BulkPutAsync<VoidResponse>(Index, "_doc", bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
