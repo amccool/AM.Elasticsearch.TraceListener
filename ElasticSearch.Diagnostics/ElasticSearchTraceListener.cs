@@ -24,6 +24,8 @@ namespace ElasticSearch.Diagnostics
     /// </summary>
     public class ElasticSearchTraceListener : TraceListenerBase
     {
+        private const string DocumentType = "doc";
+
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
 
         private IElasticLowLevelClient _client;
@@ -376,7 +378,7 @@ namespace ElasticSearch.Diagnostics
         {
 	        try
 	        {
-                await Client.IndexAsync<VoidResponse>(Index, "_doc", jo.ToString());
+                await Client.IndexAsync<VoidResponse>(Index, DocumentType, jo.ToString());
 	        }
 	        catch (Exception ex)
 	        {
@@ -389,7 +391,7 @@ namespace ElasticSearch.Diagnostics
             if (!jos.Any())
                 return;
 
-            var indx = new { index = new { _index = Index, _type = "_doc" } };
+            var indx = new { index = new { _index = Index, _type = DocumentType } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
@@ -397,7 +399,7 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-	            await Client.BulkPutAsync<VoidResponse>(Index, "_doc", bbo.ToArray(), br => br.Refresh(false));
+	            await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
