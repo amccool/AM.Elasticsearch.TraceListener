@@ -1,5 +1,12 @@
 # ElasticSearch.Diagnostics
 
+## 3.0 Release Notes
+
+the _type submitted is being changed from `Trace` to `doc` in preparation to posting to Elasticsearch 6.x, as _type is being deprecated.
+
+nuget version > then 2.x have this change
+
+
 ## 1.1 Release Notes
 
 the attribute 
