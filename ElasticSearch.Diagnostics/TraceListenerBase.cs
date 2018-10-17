@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 
-namespace ElasticSearch.Diagnostics
+namespace AM.Elasticsearch.TraceListener
 {
     /// <summary>
     /// Trace listener that forwards all calls to a single template method,
@@ -31,7 +31,7 @@ namespace ElasticSearch.Diagnostics
     /// the .NET Framework.
     /// </para>
     /// </remarks>
-    public abstract class TraceListenerBase : TraceListener
+    public abstract class TraceListenerBase : System.Diagnostics.TraceListener
     {
         const string CategorySeparator = ": ";
 
@@ -156,7 +156,7 @@ namespace ElasticSearch.Diagnostics
         {
             if ((base.Filter == null) || base.Filter.ShouldTrace(eventCache, source, TraceEventType.Transfer, id, message, null, null, null))
             {
-                var traceMessage = string.Format(CultureInfo.CurrentCulture, Resource.TraceListenerBase_TraceMessageFormat, message, relatedActivityId);
+                var traceMessage = string.Format(CultureInfo.CurrentCulture, "{0}, relatedActivityId={1}", message, relatedActivityId);
                 WriteTrace(eventCache, source, TraceEventType.Transfer, id, traceMessage, relatedActivityId, null);
             }
         }

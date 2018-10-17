@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace ElasticSearch.Diagnostics
+namespace AM.Elasticsearch.TraceListener
 {
     /// <summary>
     /// A TraceListener class used to submit trace data to elasticsearch

@@ -6,6 +6,7 @@ using Xunit.Abstractions;
 using Xunit;
 using System.Net;
 using System.Security.Principal;
+using AM.Elasticsearch.TraceListener;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
@@ -17,35 +18,6 @@ namespace ElasticSearch.Diagnostics.Tests
         {
             this.output = output;
         }
-
-
-        //[ClassInitialize()]        //Use ClassInitialize to run code before you run the first test in the class.
-        //public static void ci(TestContext tc)
-        //{
-        //    TaskScheduler.UnobservedTaskException += (object sender, UnobservedTaskExceptionEventArgs eventArgs) =>
-        //    {
-        //        eventArgs.SetObserved();
-        //        ((AggregateException)eventArgs.Exception).Handle(ex =>
-        //        {
-        //            Debug.WriteLine("Exception type: {0}", ex.GetType());
-        //            return true;
-        //        });
-        //    };
-        //}
-
-        //[ClassCleanup()]//        Use ClassCleanup to run code after all tests in a class have run.
-        //public static void cc()
-        //{ }
-
-        //[TestInitialize()] //Use TestInitialize to run code before you run each test.
-        //public void ti()
-        //{ }
-
-        //[TestCleanup()] //Use TestCleanup to run code after each test has run.
-        //public void tc()
-        //{
-        //    Thread.Sleep(500);
-        //}
 
         [Fact]
         public void SimpleWrite()
