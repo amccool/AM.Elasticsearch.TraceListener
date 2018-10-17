@@ -1,39 +1,83 @@
-﻿using System;
+﻿using AM.Elasticsearch.TraceListener;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
-using Xunit;
+using System.Linq;
 using System.Net;
-using System.Security.Principal;
-using AM.Elasticsearch.TraceListener;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
-    public class ESTLUnitTests
+    public class esinsideTests : IDisposable
     {
         private readonly ITestOutputHelper output;
+        private readonly ElasticsearchInside.Elasticsearch _elasticsearch;
 
-        public ESTLUnitTests(ITestOutputHelper output)
+        public esinsideTests(ITestOutputHelper output)
         {
             this.output = output;
+            _elasticsearch = new ElasticsearchInside.Elasticsearch();
+            }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _elasticsearch?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
+            }
         }
 
-        [Fact]
-        public void SimpleWrite()
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~esinsideTests() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
         {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+
+
+        [Fact]
+        public async Task SimpleWrite()
+        {
+            ////Arrange
+            await _elasticsearch.Ready();
+
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             x.Write(4);
         }
 
         [Fact]
-        public void WriteObjectTest()
+        public async Task WriteObjectTest()
         {
+            await _elasticsearch.Ready();
+
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
 
@@ -46,10 +90,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void WriteExceptionest()
+        public async Task WriteExceptionest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             try
@@ -60,7 +104,7 @@ namespace ElasticSearch.Diagnostics.Tests
             catch (Exception ex)
             {
                 x.Write(ex);
-                //throw;
+                throw;
             }
 
         }
@@ -70,10 +114,10 @@ namespace ElasticSearch.Diagnostics.Tests
 
 
         [Fact]
-        public void ALOTofExmsgs()
+        public async Task ALOTofExmsgs()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 100; i++)
@@ -85,10 +129,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void WriteManySimpleStringsTest()
+        public async Task WriteManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 10; i++)
@@ -99,10 +143,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TraceSourceManySimpleStringsTest()
+        public async Task TraceSourceManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -117,10 +161,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TSTestTimeIds()
+        public async Task TSTestTimeIds()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -135,10 +179,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TSManyWriteExceptionsTest()
+        public async Task TSManyWriteExceptionsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -160,10 +204,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TraceDataWithString()
+        public async Task TraceDataWithString()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -177,16 +221,16 @@ namespace ElasticSearch.Diagnostics.Tests
 
 
 
-        public class Junk
+        class Junk
         {
             public IPAddress ipaddr { get; set; }
         }
 
         [Fact]
-        public void CauseFailedSerialization()
+        public async Task CauseFailedSerialization()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -195,17 +239,17 @@ namespace ElasticSearch.Diagnostics.Tests
             for (int i = 0; i < 50; i++)
             {
 
-            ts.TraceData(TraceEventType.Information, 99, new Junk()
-            {
-                ipaddr = IPAddress.Parse("1.1.1.1")
-            });
+                ts.TraceData(TraceEventType.Information, 99, new ESTLUnitTests.Junk()
+                {
+                    ipaddr = IPAddress.Parse("1.1.1.1")
+                });
             }
 
             ts.Flush();
         }
 
         //[Fact]
-        //public void IdentityTest()
+        //public async Task IdentityTest()
         //{
         //    IPrincipal principal = Thread.CurrentPrincipal;
         //    IIdentity identity = principal == null ? null : principal.Identity;
@@ -215,7 +259,7 @@ namespace ElasticSearch.Diagnostics.Tests
         //}
 
         [Fact]
-        public void UserNameTest()
+        public async Task UserNameTest()
         {
             string name = Environment.UserDomainName + "\\" + Environment.UserName;
 
