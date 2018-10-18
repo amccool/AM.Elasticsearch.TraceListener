@@ -60,6 +60,7 @@ namespace ElasticSearch.Diagnostics.Tests
             catch (Exception ex)
             {
                 x.Write(ex);
+                //dont throw we want to see that the exception got writ
                 //throw;
             }
 

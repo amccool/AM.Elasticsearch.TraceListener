@@ -20,7 +20,7 @@ namespace ElasticSearch.Diagnostics.Tests
         {
             this.output = output;
             _elasticsearch = new ElasticsearchInside.Elasticsearch();
-            }
+        }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
@@ -104,7 +104,8 @@ namespace ElasticSearch.Diagnostics.Tests
             catch (Exception ex)
             {
                 x.Write(ex);
-                throw;
+                //dont throw we want to see that the exception got writ
+                //throw;
             }
 
         }
