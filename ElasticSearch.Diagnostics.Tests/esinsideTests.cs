@@ -11,61 +11,27 @@ using Xunit.Abstractions;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
-    public class esinsideTests : IDisposable
+    public class esinsideTests : IClassFixture<Fixture>
     {
-        private readonly ITestOutputHelper output;
-        private readonly ElasticsearchInside.Elasticsearch _elasticsearch;
+        private readonly ITestOutputHelper _output;
 
-        public esinsideTests(ITestOutputHelper output)
+        private readonly Fixture _fixture;
+        //private readonly ElasticsearchInside.Elasticsearch _elasticsearch;
+
+        public esinsideTests(ITestOutputHelper output, Fixture fixture)
         {
-            this.output = output;
-            _elasticsearch = new ElasticsearchInside.Elasticsearch();
+            _output = output;
+            _fixture = fixture;
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    _elasticsearch?.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-
-                disposedValue = true;
-            }
-        }
-
-        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
-        // ~esinsideTests() {
-        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        //   Dispose(false);
-        // }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
-        }
-        #endregion
 
 
         [Fact]
         public async Task SimpleWrite()
         {
-            ////Arrange
-            await _elasticsearch.Ready();
 
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = _elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             x.Write(4);
@@ -74,10 +40,8 @@ namespace ElasticSearch.Diagnostics.Tests
         [Fact]
         public async Task WriteObjectTest()
         {
-            await _elasticsearch.Ready();
-
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
 
@@ -93,7 +57,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task WriteExceptionest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             try
@@ -118,7 +82,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task ALOTofExmsgs()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 100; i++)
@@ -133,7 +97,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task WriteManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 10; i++)
@@ -147,7 +111,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task TraceSourceManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri =_fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -165,7 +129,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task TSTestTimeIds()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -183,7 +147,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task TSManyWriteExceptionsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -208,7 +172,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task TraceDataWithString()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -231,7 +195,7 @@ namespace ElasticSearch.Diagnostics.Tests
         public async Task CauseFailedSerialization()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri =_elasticsearch.Url.ToString();
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -264,7 +228,7 @@ namespace ElasticSearch.Diagnostics.Tests
         {
             string name = Environment.UserDomainName + "\\" + Environment.UserName;
 
-            this.output.WriteLine(name);
+            _output.WriteLine(name);
 
             Assert.False(string.IsNullOrWhiteSpace(name));
         }
