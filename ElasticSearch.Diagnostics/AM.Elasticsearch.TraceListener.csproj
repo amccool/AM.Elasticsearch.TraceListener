@@ -2,13 +2,13 @@
   <PropertyGroup>
     <Authors>Alex McCool</Authors>
     <Company />
-    <PackageId>ElasticSearch.Diagnostics</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>AM.ElasticSearch.TraceListener</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyName>AM.Elasticsearch.TraceListener</AssemblyName>
     <RootNamespace>AM.Elasticsearch.TraceListener</RootNamespace>
     <TargetFramework>net461</TargetFramework>
-    <AssemblyTitle>ElasticSearch.Diagnostics</AssemblyTitle>
-    <Product>ElasticSearch.Diagnostics</Product>
+    <AssemblyTitle>AM.ElasticSearch.TraceListener</AssemblyTitle>
+    <Product>AM.ElasticSearch.TraceListener</Product>
     <Description>TraceListener for ElasticSearch and kibana</Description>
     <Copyright>MIT</Copyright>
     <Version>1.2.0.0</Version>
