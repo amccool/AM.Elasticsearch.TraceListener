@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+//using Elasticsearch.Net.Connection;
+
 namespace ElasticSearch.Diagnostics
 {
     /// <summary>
@@ -38,10 +40,15 @@ namespace ElasticSearch.Diagnostics
         /// </summary>
         private Uri Uri { get; set; }
 
-        /// <summary>
-        /// prefix for the Index for traces
-        /// </summary>
-        private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH");
+	    private string ElasticSearchTraceIndex { get; set; }
+	    private string ElasticSearchIndexDatePattern { get; set; }
+
+
+
+		/// <summary>
+		/// prefix for the Index for traces
+		/// </summary>
+		private string Index => this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString(this.ElasticSearchIndexDatePattern);
 
 
         private static readonly string[] _supportedAttributes = new string[]
@@ -63,10 +70,16 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        /// <summary>
+	    public override object InitializeLifetimeService()
+	    {
+		    return base.InitializeLifetimeService();
+	    }
+
+
+	    /// <summary>
         /// Uri for the ElasticSearch server
         /// </summary>
-        public string ElasticSearchUri
+        public string ElasticSearchUriAttribute
         {
             get
             {
@@ -87,10 +100,32 @@ namespace ElasticSearch.Diagnostics
         }
 
         /// <summary>
+        /// Uri for the ElasticSearch server
+        /// </summary>
+        public string ElasticSearchIndexDatePatternAttribute
+		{
+            get
+            {
+                if (Attributes.ContainsKey("elasticsearchindexdatepattern"))
+                {
+                    return Attributes["elasticsearchindexdatepattern"];
+                }
+                else
+                {
+                    return DEFAULT_DATE_PATTERN;
+                }
+            }
+            set
+            {
+                Attributes["elasticsearchindexdatepattern"] = value;
+            }
+        }
+
+        /// <summary>
         /// prefix for the Index for traces
         /// </summary>
-        public string ElasticSearchTraceIndex
-        {
+        public string ElasticSearchTraceIndexAttribute
+		{
             get
             {
                 if (Attributes.ContainsKey("elasticsearchtraceindex"))
@@ -99,8 +134,7 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    //return _defaultTemplate;
-                    throw new ArgumentException($"{nameof(ElasticSearchTraceIndex)} attribute is not defined");
+	                return @"trace";
                 }
             }
             set
@@ -109,6 +143,49 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
+		/// <summary>
+		/// BufferSize for number of traces to buffer
+		/// </summary>
+		public int BufferSizeAttribute
+		{
+		    get
+		    {
+			    if (Attributes.ContainsKey("buffersize"))
+			    {
+				    return int.Parse( Attributes["buffersize"]);
+			    }
+			    else
+			    {
+				    return BUFFER_SIZE;
+			    }
+		    }
+		    set
+		    {
+			    Attributes["buffersize"] = value.ToString();
+		    }
+	    }
+
+		/// <summary>
+		/// BufferSize for number of traces to buffer
+		/// </summary>
+		public int BufferWaitSecondsAttribute
+		{
+		    get
+		    {
+			    if (Attributes.ContainsKey("bufferwaitseconds"))
+			    {
+				    return int.Parse( Attributes["bufferwaitseconds"]);
+			    }
+			    else
+			    {
+				    return BUFFER_WAIT_SECONDS;
+			    }
+		    }
+		    set
+		    {
+			    Attributes["bufferwaitseconds"] = value.ToString();
+		    }
+	    }
 
 
         /// <summary>
@@ -127,7 +204,7 @@ namespace ElasticSearch.Diagnostics
                 }
                 else
                 {
-                    Uri = new Uri(this.ElasticSearchUri);
+                    Uri = new Uri(this.ElasticSearchUriAttribute);
 
 					//Index = this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
 					//var cs = new ConnectionSettings(Uri);
@@ -176,8 +253,19 @@ namespace ElasticSearch.Diagnostics
 
         private void Initialize()
         {
+	        var bufferSize = this.BufferSizeAttribute;
+	        var bufferTime = TimeSpan.FromSeconds(this.BufferWaitSecondsAttribute);
+
+	        this.ElasticSearchTraceIndex = this.ElasticSearchTraceIndexAttribute;
+	        this.ElasticSearchIndexDatePattern = this.ElasticSearchIndexDatePatternAttribute;
+
+			//test the formatter, and blow
+	        var test = this.Index;
+
+			//TODO - make sure this is a valid
+
             //SetupObserver();
-            SetupObserverBatchy();
+            SetupObserverBatchy(bufferTime, bufferSize);
         }
 
         private Action<JObject> _scribeProcessor;
@@ -193,13 +281,13 @@ namespace ElasticSearch.Diagnostics
         }
 
 
-        private void SetupObserverBatchy()
+        private void SetupObserverBatchy(TimeSpan waittime, int size)
         {
             _scribeProcessor = a => WriteToQueueForprocessing(a);
 
             this._queueToBePosted.GetConsumingEnumerable()
                 .ToObservable(Scheduler.Default)
-                .Buffer(TimeSpan.FromSeconds(1), 10)
+                .Buffer(waittime, size)
                 .Subscribe(async x => await this.WriteDirectlyToESAsBatch(x));
         }
 
@@ -218,10 +306,10 @@ namespace ElasticSearch.Diagnostics
             object data)
         {
 
-            //if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
-            //{
-            //    return;
-            //}
+            if (eventCache != null && eventCache.Callstack.Contains(nameof(Elasticsearch.Net.ElasticLowLevelClient)))
+            {
+                return;
+            }
 
             string updatedMessage = message;
             JObject payload = null;
@@ -378,7 +466,7 @@ namespace ElasticSearch.Diagnostics
         {
 	        try
 	        {
-                await Client.IndexAsync<VoidResponse>(Index, DocumentType, jo.ToString());
+                await Client.IndexAsync<VoidResponse>(Index, "Trace", jo.ToString());
 	        }
 	        catch (Exception ex)
 	        {
@@ -391,7 +479,7 @@ namespace ElasticSearch.Diagnostics
             if (!jos.Any())
                 return;
 
-            var indx = new { index = new { _index = Index, _type = DocumentType } };
+            var indx = new { index = new { _index = Index, _type = "Trace" } };
             var indxC = Enumerable.Repeat(indx, jos.Count());
 
             var bb = jos.Zip(indxC, (f, s) => new object[] { s, f });
@@ -399,7 +487,7 @@ namespace ElasticSearch.Diagnostics
 
             try
             {
-	            await Client.BulkPutAsync<VoidResponse>(Index, DocumentType, bbo.ToArray(), br => br.Refresh(false));
+	            await Client.BulkPutAsync<VoidResponse>(Index, "Trace", bbo.ToArray(), br => br.Refresh(false));
             }
             catch (Exception ex)
             {
