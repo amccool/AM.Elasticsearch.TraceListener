@@ -57,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="kibana.json" />
     <None Include="Service References\weatherService\ElasticSearch.Diagnostics.Tester.weatherService.ForecastReturn.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

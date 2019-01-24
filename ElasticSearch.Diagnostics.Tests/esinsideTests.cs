@@ -240,7 +240,7 @@ namespace ElasticSearch.Diagnostics.Tests
             for (int i = 0; i < 50; i++)
             {
 
-                ts.TraceData(TraceEventType.Information, 99, new ESTLUnitTests.Junk()
+                ts.TraceData(TraceEventType.Information, 99, new Junk()
                 {
                     ipaddr = IPAddress.Parse("1.1.1.1")
                 });
