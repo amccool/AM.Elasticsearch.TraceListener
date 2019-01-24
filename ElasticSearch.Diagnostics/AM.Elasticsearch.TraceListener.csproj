@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Authors>Alex McCool</Authors>
+    <Company />
+    <PackageId>ElasticSearch.Diagnostics</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>AM.Elasticsearch.TraceListener</AssemblyName>
+    <RootNamespace>AM.Elasticsearch.TraceListener</RootNamespace>
+    <TargetFramework>net461</TargetFramework>
+    <AssemblyTitle>ElasticSearch.Diagnostics</AssemblyTitle>
+    <Product>ElasticSearch.Diagnostics</Product>
+    <Description>TraceListener for ElasticSearch and kibana</Description>
+    <Copyright>MIT</Copyright>
+    <Version>1.2.0.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <PackageProjectUrl>https://github.com/amccool/AM.Elasticsearch.TraceListener</PackageProjectUrl>
+    <PackageTags>Diagnostics, Trace, TraceListener, ElasticSearch, Kibana</PackageTags>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Elasticsearch.Net" Version="2.5.8" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.Reactive" Version="3.1.1" />
+  </ItemGroup>
+
+</Project>

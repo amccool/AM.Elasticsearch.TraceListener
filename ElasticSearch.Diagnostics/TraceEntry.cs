@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ElasticSearch.Diagnostics
+namespace AM.Elasticsearch.TraceListener
 {
+    /// <summary>
+    /// it would be nice to use this class for serialization but alas that was not to be
+    /// </summary>
     class TraceEntry
     {
         public string Source { get; set; }

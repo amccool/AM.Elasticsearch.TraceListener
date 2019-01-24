@@ -1,67 +1,47 @@
-﻿using System;
+﻿using AM.Elasticsearch.TraceListener;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit.Abstractions;
-using Xunit;
+using System.Linq;
 using System.Net;
-using System.Security.Principal;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace ElasticSearch.Diagnostics.Tests
 {
-    public class ESTLUnitTests
+    public class esinsideTests : IClassFixture<Fixture>
     {
-        private readonly ITestOutputHelper output;
+        private readonly ITestOutputHelper _output;
 
-        public ESTLUnitTests(ITestOutputHelper output)
+        private readonly Fixture _fixture;
+        //private readonly ElasticsearchInside.Elasticsearch _elasticsearch;
+
+        public esinsideTests(ITestOutputHelper output, Fixture fixture)
         {
-            this.output = output;
+            _output = output;
+            _fixture = fixture;
         }
 
 
-        //[ClassInitialize()]        //Use ClassInitialize to run code before you run the first test in the class.
-        //public static void ci(TestContext tc)
-        //{
-        //    TaskScheduler.UnobservedTaskException += (object sender, UnobservedTaskExceptionEventArgs eventArgs) =>
-        //    {
-        //        eventArgs.SetObserved();
-        //        ((AggregateException)eventArgs.Exception).Handle(ex =>
-        //        {
-        //            Debug.WriteLine("Exception type: {0}", ex.GetType());
-        //            return true;
-        //        });
-        //    };
-        //}
-
-        //[ClassCleanup()]//        Use ClassCleanup to run code after all tests in a class have run.
-        //public static void cc()
-        //{ }
-
-        //[TestInitialize()] //Use TestInitialize to run code before you run each test.
-        //public void ti()
-        //{ }
-
-        //[TestCleanup()] //Use TestCleanup to run code after each test has run.
-        //public void tc()
-        //{
-        //    Thread.Sleep(500);
-        //}
 
         [Fact]
-        public void SimpleWrite()
+        public async Task SimpleWrite()
         {
+
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             x.Write(4);
         }
 
         [Fact]
-        public void WriteObjectTest()
+        public async Task WriteObjectTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
 
@@ -74,10 +54,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void WriteExceptionest()
+        public async Task WriteExceptionest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             try
@@ -88,6 +68,7 @@ namespace ElasticSearch.Diagnostics.Tests
             catch (Exception ex)
             {
                 x.Write(ex);
+                //dont throw we want to see that the exception got writ
                 //throw;
             }
 
@@ -98,10 +79,10 @@ namespace ElasticSearch.Diagnostics.Tests
 
 
         [Fact]
-        public void ALOTofExmsgs()
+        public async Task ALOTofExmsgs()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 100; i++)
@@ -113,10 +94,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void WriteManySimpleStringsTest()
+        public async Task WriteManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             for (int i = 0; i < 10; i++)
@@ -127,10 +108,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TraceSourceManySimpleStringsTest()
+        public async Task TraceSourceManySimpleStringsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri =_fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -145,10 +126,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TSTestTimeIds()
+        public async Task TSTestTimeIds()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("x", SourceLevels.All);
@@ -163,10 +144,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TSManyWriteExceptionsTest()
+        public async Task TSManyWriteExceptionsTest()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -188,10 +169,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void TraceDataWithString()
+        public async Task TraceDataWithString()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -211,10 +192,10 @@ namespace ElasticSearch.Diagnostics.Tests
         }
 
         [Fact]
-        public void CauseFailedSerialization()
+        public async Task CauseFailedSerialization()
         {
             var x = new ElasticSearchTraceListener("tester");
-            x.ElasticSearchUri = "http://192.168.204.198:9200";
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
             x.ElasticSearchTraceIndex = "trace";
 
             var ts = new TraceSource("exxxxx", SourceLevels.All);
@@ -223,17 +204,17 @@ namespace ElasticSearch.Diagnostics.Tests
             for (int i = 0; i < 50; i++)
             {
 
-            ts.TraceData(TraceEventType.Information, 99, new Junk()
-            {
-                ipaddr = IPAddress.Parse("1.1.1.1")
-            });
+                ts.TraceData(TraceEventType.Information, 99, new Junk()
+                {
+                    ipaddr = IPAddress.Parse("1.1.1.1")
+                });
             }
 
             ts.Flush();
         }
 
         //[Fact]
-        //public void IdentityTest()
+        //public async Task IdentityTest()
         //{
         //    IPrincipal principal = Thread.CurrentPrincipal;
         //    IIdentity identity = principal == null ? null : principal.Identity;
@@ -243,11 +224,11 @@ namespace ElasticSearch.Diagnostics.Tests
         //}
 
         [Fact]
-        public void UserNameTest()
+        public async Task UserNameTest()
         {
             string name = Environment.UserDomainName + "\\" + Environment.UserName;
 
-            this.output.WriteLine(name);
+            _output.WriteLine(name);
 
             Assert.False(string.IsNullOrWhiteSpace(name));
         }

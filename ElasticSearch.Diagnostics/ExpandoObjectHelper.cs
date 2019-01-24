@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace ElasticSearch.Diagnostics
+namespace AM.Elasticsearch.TraceListener
 {
     class ExpandoObjectHelper
     {

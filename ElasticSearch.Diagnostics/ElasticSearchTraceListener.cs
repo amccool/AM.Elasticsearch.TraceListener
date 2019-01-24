@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace ElasticSearch.Diagnostics
+namespace AM.Elasticsearch.TraceListener
 {
     /// <summary>
     /// A TraceListener class used to submit trace data to elasticsearch
@@ -30,8 +30,8 @@ namespace ElasticSearch.Diagnostics
 
         private IElasticLowLevelClient _client;
 
-        private string _userDomainName;
-        private string _userName;
+        private readonly string _userDomainName;
+        private readonly string _userName;
 
         /// <summary>
         /// Uri for the ElasticSearch server
@@ -129,11 +129,6 @@ namespace ElasticSearch.Diagnostics
                 {
                     Uri = new Uri(this.ElasticSearchUri);
 
-					//Index = this.ElasticSearchTraceIndex.ToLower() + "-" + DateTime.UtcNow.ToString("yyyy-MM-dd");
-					//var cs = new ConnectionSettings(Uri);
-					//cs.ExposeRawResponse();
-					//cs.ThrowOnElasticsearchServerExceptions();
-
 					var singleNode = new SingleNodeConnectionPool(Uri);
 
 	                var cc = new ConnectionConfiguration(singleNode,
@@ -195,7 +190,7 @@ namespace ElasticSearch.Diagnostics
 
         private void SetupObserverBatchy()
         {
-            _scribeProcessor = a => WriteToQueueForprocessing(a);
+            _scribeProcessor = a => WriteToQueueForProcessing(a);
 
             this._queueToBePosted.GetConsumingEnumerable()
                 .ToObservable(Scheduler.Default)
@@ -407,7 +402,7 @@ namespace ElasticSearch.Diagnostics
             }
         }
 
-        private void WriteToQueueForprocessing(JObject jo)
+        private void WriteToQueueForProcessing(JObject jo)
         {
             this._queueToBePosted.Add(jo);
         }
