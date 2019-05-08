@@ -31,20 +31,19 @@ ElasticSearch TraceListener is a System.Diagnostics based TraceListener which su
 [![nuget downloads](https://img.shields.io/nuget/dt/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
 [![nuget version](https://img.shields.io/nuget/v/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
 
-Install the package from nuget.org https://www.nuget.org/packages/ElasticSearch.Diagnostics/
+Install the package from nuget.org https://www.nuget.org/packages/AM.Elasticsearch.TraceListener/
 
 ```ps
-Install-Package ElasticSearch.Diagnostics
+Install-Package AM.Elasticsearch.TraceListener
 ```
 
 edit your app.config/web.config
 
     <system.diagnostics>
         <sharedListeners>
-            <add name="estl" type="ElasticSearch.Diagnostics.ElasticSearchTraceListener, ElasticSearch.Diagnostics"
-                ElasticSearchUri="http://127.1.1.1:9200"
-                ElasticSearchTraceIndex="trace"
-            />
+            <add name="estl" 
+         type="AM.Elasticsearch.TraceListener.ElasticSearchTraceListener, AM.Elasticsearch.TraceListener" 
+         ElasticSearchUri="http://localhost:9200" ElasticSearchIndex="trace" ElasticSearchTraceIndex="trace" />
         </sharedListeners>
         <trace autoflush="false" indentsize="4">
           <listeners>
