@@ -1,4 +1,4 @@
-# ElasticSearch.Diagnostics
+# AM.Elasticsearch.TraceListener
 
 ## 3.0 Release Notes
 
@@ -19,6 +19,8 @@ is redundant, its value is ignored.   Next minor release it will be removed, whi
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics)
 
+AM.Elasticsearch.TraceListener
+
 ### Master build
 
 [![Build status](https://ci.appveyor.com/api/projects/status/1let8gsvksxjv50c/branch/master?svg=true)](https://ci.appveyor.com/project/amccool/elasticsearch-diagnostics/branch/master)
@@ -28,8 +30,8 @@ ElasticSearch TraceListener is a System.Diagnostics based TraceListener which su
 
 ## Getting Started
 
-[![nuget downloads](https://img.shields.io/nuget/dt/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
-[![nuget version](https://img.shields.io/nuget/v/elasticsearch.diagnostics.svg)](https://www.nuget.org/packages/ElasticSearch.Diagnostics/)
+[![nuget downloads](https://img.shields.io/nuget/dt/AM.Elasticsearch.TraceListener.svg)](https://www.nuget.org/packages/AM.Elasticsearch.TraceListener/)
+[![nuget version](https://img.shields.io/nuget/v/AM.Elasticsearch.TraceListener.svg)](https://www.nuget.org/packages/AM.Elasticsearch.TraceListener/)
 
 Install the package from nuget.org https://www.nuget.org/packages/AM.Elasticsearch.TraceListener/
 
