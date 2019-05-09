@@ -80,6 +80,7 @@
     <Compile Include="esinsideTests.cs" />
     <Compile Include="Fixture.cs" />
     <Compile Include="Junk.cs" />
+    <Compile Include="ObjectWithPropertyThatThrows.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

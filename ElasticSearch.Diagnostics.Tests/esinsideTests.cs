@@ -233,6 +233,20 @@ namespace ElasticSearch.Diagnostics.Tests
             Assert.False(string.IsNullOrWhiteSpace(name));
         }
 
+        [Fact]
+        public async Task SometimesExceptionsThrowWhenSerialized()
+        {
+            var x = new ElasticSearchTraceListener("tester");
+            x.ElasticSearchUri = _fixture.Elasticsearch.Url.ToString();
+            x.ElasticSearchTraceIndex = "trace";
 
+            var ts = new TraceSource("exxxxx", SourceLevels.All);
+            ts.Listeners.Add(x);
+
+            ts.TraceData(TraceEventType.Error, 99, new ObjectWithPropertyThatThrows());
+            Assert.True(true);  //we did not blow up trying to serialize "ObjectThatThrows"
+
+            x.Flush();
+        }
     }
 }
