@@ -222,62 +222,63 @@ namespace AM.Elasticsearch.TraceListener
             JObject payload = null;
             if (data != null)
             {
-                if (data is Exception)
+                try
                 {
-                    updatedMessage = ((Exception)data).Message;
-                    payload = JObject.FromObject(data);
-                }
-                else if (data is XPathNavigator)
-                {
-                    var xdata = data as XPathNavigator;
-                    //xdata.MoveToRoot();
-
-                    XDocument xmlDoc;
-                    try
+                    if (data is Exception)
                     {
-                        xmlDoc = XDocument.Parse(xdata.OuterXml);
-
+                        updatedMessage = ((Exception)data).Message;
+                        payload = JObject.FromObject(data);
                     }
-                    catch (Exception)
+                    else if (data is XPathNavigator)
                     {
-                        xmlDoc = XDocument.Parse(xdata.ToString());
-                        //eat
-                        //throw;
+                        var xdata = data as XPathNavigator;
+                        //xdata.MoveToRoot();
+
+                        XDocument xmlDoc;
+                        try
+                        {
+                            xmlDoc = XDocument.Parse(xdata.OuterXml);
+
+                        }
+                        catch (Exception)
+                        {
+                            xmlDoc = XDocument.Parse(xdata.ToString());
+                            //eat
+                            //throw;
+                        }
+
+                        // Convert the XML document in to a dynamic C# object.
+                        dynamic xmlContent = new ExpandoObject();
+                        ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
+
+                        string json = JsonConvert.SerializeObject(xmlContent);
+                        payload = JObject.Parse(json);
                     }
-
-                    // Convert the XML document in to a dynamic C# object.
-                    dynamic xmlContent = new ExpandoObject();
-                    ExpandoObjectHelper.Parse(xmlContent, xmlDoc.Root);
-
-                    string json = JsonConvert.SerializeObject(xmlContent);
-                    payload = JObject.Parse(json);
-                }
-                else if (data is DateTime)
-                {
-                    payload = new JObject();
-                    payload.Add("System.DateTime", (DateTime)data);
-                }
-                else if (data is string)
-                {
-                    payload = new JObject();
-                    payload.Add("string", (string)data);
-                }
-                else if (data.GetType().IsValueType)
-                {
-                    payload = new JObject { { "data", data.ToString() } };
-                }
-                else
-                {
-                    try
+                    else if (data is DateTime)
+                    {
+                        payload = new JObject();
+                        payload.Add("System.DateTime", (DateTime)data);
+                    }
+                    else if (data is string)
+                    {
+                        payload = new JObject();
+                        payload.Add("string", (string)data);
+                    }
+                    else if (data.GetType().IsValueType)
+                    {
+                        payload = new JObject { { "data", data.ToString() } };
+                    }
+                    else
                     {
                         payload = JObject.FromObject(data);
                     }
-                    catch(JsonSerializationException jEx)
-                    {
-                        payload = new JObject();
-                        payload.Add("FAILURE", jEx.Message);
-                        payload.Add("data", data.GetType().ToString());
-                    }
+                }
+                catch (JsonSerializationException jEx)
+                {
+                    payload = new JObject();
+                    payload.Add("FAILURE", jEx.ToString()); //using .ToString() instead of .Message will give you the stack dump too
+                    payload.Add("datatype", data.GetType().ToString());
+                    payload.Add("data", data.ToString());   //rather than just log the name of the Type, this will give us the stack dump if data was originally an exception, maybe some other useful info
                 }
             }
 
