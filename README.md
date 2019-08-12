@@ -45,7 +45,7 @@ edit your app.config/web.config
         <sharedListeners>
             <add name="estl" 
          type="AM.Elasticsearch.TraceListener.ElasticSearchTraceListener, AM.Elasticsearch.TraceListener" 
-         ElasticSearchUri="http://localhost:9200" ElasticSearchIndex="trace" ElasticSearchTraceIndex="trace" />
+         ElasticSearchUri="http://localhost:9200" ElasticSearchTraceIndex="trace" />
         </sharedListeners>
         <trace autoflush="false" indentsize="4">
           <listeners>
