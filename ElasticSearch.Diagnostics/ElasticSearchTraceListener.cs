@@ -25,6 +25,8 @@ namespace AM.Elasticsearch.TraceListener
     public class ElasticSearchTraceListener : TraceListenerBase
     {
         private const string DocumentType = "doc";
+        private const string _defaultIndexName = "trace";
+        private const string _defaultUri = "http://localhost:9200/";
 
         private readonly BlockingCollection<JObject> _queueToBePosted = new BlockingCollection<JObject>();
 
@@ -76,8 +78,7 @@ namespace AM.Elasticsearch.TraceListener
                 }
                 else
                 {
-                    //return _defaultTemplate;
-                    throw new ArgumentException($"{nameof(ElasticSearchUri)} attribute is not defined");
+                    return _defaultUri;
                 }
             }
             set
@@ -99,8 +100,7 @@ namespace AM.Elasticsearch.TraceListener
                 }
                 else
                 {
-                    //return _defaultTemplate;
-                    throw new ArgumentException($"{nameof(ElasticSearchTraceIndex)} attribute is not defined");
+                    return _defaultIndexName;
                 }
             }
             set
