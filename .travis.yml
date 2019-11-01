@@ -1,2 +1,21 @@
 language: csharp
 solution: ElasticSearch.Diagnostics.sln
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "pLG/M+v+UVS7WWsM1L6ZmQfPoQPDX8p6sI9AYolKRCvUF6J8bWB/gpHd5umFcBFfY8okGbm8ItlheM++Ur8sUgV6syHKx2yzhgt6BupDmfXWTlvOmVftoI5JM27AYRTqqmey96rdXyicK7Iiye40vqxRuzkqaHj8N9TC10DLNsMRXiNNCS29pY6vqXhR0ZCr+yHeqQ9EUzwm6seiyyRo8zqcdl3rh+J5wQAT8QaLXTV4z+cS/2NT8bVpMhgugOrxw5sxMWo3hAYWeWW4FajkMDyjtL0DlApikhDE1kBELRQsmMTxYHhfePavyh7GEky5BBEYyoXjvxAqxIEbVisRP5SdPFzatCpYF+HuQrR9a8JhYw5QEVMnM4mkOO7y/RfJ/VtDgH/XaNWDTdlgGzBwKgsyCi1ZtRSdalJHHoVylMFpA72gkxVU7AkObvgMHhJzlA+25HxFrZC3FZzydNynww7uZPMFdNKg0Gby5RfrS1aJOSH7RizVm63i5s4tQnrcbfoxoTPp5nPJIEU38VJ/i1oXsd33DwjeK8tgV4DZrrQezCQP4XXNjs/+mpf0PuoA15gunogneYP2zQDjfQaPiTEzMTxJSVKj/JbXox9DeKLcmjJxP/BVR/cVlYsY/ep62IClN1yERpGUUkAf4GBttc9Q1VW2lgS1zO3znvSxmXw="
+
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  coverity_scan:
+    project:
+      name: "amccool/AM.Elasticsearch.TraceListener"
+      description: "AM.Elasticsearch.TraceListener"
+    notification_email: alex.mccool@yahoo.com
+    #build_command_prepend: "<Your build preprocessing command here>"
+    #build_command: "<Your build command here>"
+    branch_pattern: coverity_scan
