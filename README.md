@@ -59,7 +59,7 @@ edit your app.config/web.config
           <add name="estl" />
         </listeners>
       </source>
-      <source name="System.Net" switchValue="All">
+      <source name="System.Net" switchValue="Error">
         <listeners>
           <add name="estl" />
         </listeners>
