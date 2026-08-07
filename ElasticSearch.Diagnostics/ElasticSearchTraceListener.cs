@@ -72,14 +72,9 @@ namespace AM.Elasticsearch.TraceListener
         {
             get
             {
-                if (Attributes.ContainsKey("elasticsearchuri"))
-                {
-                    return Attributes["elasticsearchuri"];
-                }
-                else
-                {
-                    return _defaultUri;
-                }
+                if (Attributes == null) return _defaultUri;
+                string val = Attributes["elasticsearchuri"] as string;
+                return string.IsNullOrWhiteSpace(val) ? _defaultUri : val;
             }
             set
             {
@@ -94,14 +89,9 @@ namespace AM.Elasticsearch.TraceListener
         {
             get
             {
-                if (Attributes.ContainsKey("elasticsearchtraceindex"))
-                {
-                    return Attributes["elasticsearchtraceindex"];
-                }
-                else
-                {
-                    return _defaultIndexName;
-                }
+                if (Attributes == null) return _defaultIndexName;
+                string val = Attributes["elasticsearchtraceindex"] as string;
+                return string.IsNullOrWhiteSpace(val) ? _defaultIndexName : val;
             }
             set
             {
